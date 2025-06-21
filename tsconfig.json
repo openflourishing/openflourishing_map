@@ -8,6 +8,8 @@
     "outDir": "build",
     "declarationDir": null,
     "declaration": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }

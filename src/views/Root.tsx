@@ -18,12 +18,14 @@ import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
 import SearchField from "./SearchField";
 import TagsPanel from "./TagsPanel";
+import dataset from "../dataset.json";
+
 
 const Root: FC = () => {
   const graph = useMemo(() => new DirectedGraph(), []);
   const [showContents, setShowContents] = useState(false);
   const [dataReady, setDataReady] = useState(false);
-  const [dataset, setDataset] = useState<Dataset | null>(null);
+  const [_, setDataset] = useState<Dataset | null>(null);
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     tags: {},
@@ -51,44 +53,48 @@ const Root: FC = () => {
 
   // Load data on mount:
   useEffect(() => {
-    fetch(`./dataset.json`)
-      .then((res) => res.json())
-      .then((dataset: Dataset) => {
-        const clusters = keyBy(dataset.clusters, "key");
-        const tags = keyBy(dataset.tags, "key");
+    graph.clear(); // prevents duplicate nodes
 
-        dataset.nodes.forEach((node) =>
-          graph.addNode(node.key, {
-            ...node,
-            ...omit(clusters[node.cluster], "key"),
-            image: `./images/${tags[node.tag].image}`,
-          }),
-        );
-        dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
+    const clusters = keyBy(dataset.clusters, "key");
+    const tags = keyBy(dataset.tags, "key");
 
-        // Use degrees as node sizes:
-        const scores = graph.nodes().map((node) => graph.getNodeAttribute(node, "score"));
-        const minDegree = Math.min(...scores);
-        const maxDegree = Math.max(...scores);
-        const MIN_NODE_SIZE = 3;
-        const MAX_NODE_SIZE = 30;
-        graph.forEachNode((node) =>
-          graph.setNodeAttribute(
-            node,
-            "size",
-            ((graph.getNodeAttribute(node, "score") - minDegree) / (maxDegree - minDegree)) *
-              (MAX_NODE_SIZE - MIN_NODE_SIZE) +
-              MIN_NODE_SIZE,
-          ),
-        );
+    dataset.nodes.forEach((node) =>
+      graph.addNode(node.key, {
+        ...node,
+        ...omit(clusters[node.cluster], "key"),
+        image: `./images/${tags[node.tag].image}`,
+      }),
+    );
+    dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
 
-        setFiltersState({
-          clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
-          tags: mapValues(keyBy(dataset.tags, "key"), constant(true)),
-        });
-        setDataset(dataset);
-        requestAnimationFrame(() => setDataReady(true));
-      });
+    // Use degrees as node sizes:
+    const scores = graph.nodes().map((node) => graph.getNodeAttribute(node, "score"));
+    const minDegree = Math.min(...scores);
+    const maxDegree = Math.max(...scores);
+    const MIN_NODE_SIZE = 3;
+    const MAX_NODE_SIZE = 30;
+    graph.forEachNode((node) =>
+      graph.setNodeAttribute(
+        node,
+        "size",
+        ((graph.getNodeAttribute(node, "score") - minDegree) / (maxDegree - minDegree)) *
+          (MAX_NODE_SIZE - MIN_NODE_SIZE) +
+          MIN_NODE_SIZE,
+      ),
+    );
+
+    setFiltersState({
+      clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
+      tags: mapValues(keyBy(dataset.tags, "key"), constant(true)),
+    });
+    const safeDataset: Dataset = {
+      ...dataset,
+      edges: dataset.edges.map(
+        (edge) => [edge[0], edge[1]] as [string, string]
+      ),
+    };
+    setDataset(safeDataset);
+    requestAnimationFrame(() => setDataReady(true));
   }, []);
 
   if (!dataset) return null;
