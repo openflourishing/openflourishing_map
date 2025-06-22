@@ -6,6 +6,7 @@ import { MdCategory } from "react-icons/md";
 
 import { FiltersState, Tag } from "../types";
 import Panel from "./Panel";
+import imageMap from './imageMap';
 
 const TagsPanel: FC<{
   tags: Tag[];
@@ -92,7 +93,7 @@ const TagsPanel: FC<{
                 id={`tag-${tag.key}`}
               />
               <label htmlFor={`tag-${tag.key}`}>
-                <span className="circle" style={{ backgroundImage: `url(./images/${tag.image})` }} />{" "}
+                <span className="circle" style={{ backgroundImage: `url(${imageMap[tag.image]})` }} />{" "}
                 <div className="node-label">
                   <span>{tag.key}</span>
                   <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerTag + "%" }}>
