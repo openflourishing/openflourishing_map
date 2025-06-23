@@ -4,7 +4,7 @@ export interface NodeData {
   tag: string;
   URL: string;
   cluster: string;
-  scales: Set<string>;
+  submissions: Set<string>;
   x: number;
   y: number;
 }
@@ -20,9 +20,10 @@ export interface Tag {
   image: string;
 }
 
-export interface Scale {
+export interface Submission {
   key: string;
-  name: string;
+  scale_abbr: string;
+  scale_name: string;
   citation: string;
   doi: string;
 }
@@ -32,11 +33,11 @@ export interface Dataset {
   edges: [string, string][];
   clusters: Cluster[];
   tags: Tag[];
-  scales: Scale[];
+  submissions: Submission[];
 }
 
 export interface FiltersState {
   clusters: Record<string, boolean>;
   tags: Record<string, boolean>;
-  selected_scales: Set<string>;
+  selected_submissions: Set<string>;
 }

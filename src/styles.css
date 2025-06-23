@@ -360,12 +360,7 @@ ul > li {
   cursor: pointer;
 }
 
-.scales-input-wrapper {
-  position: relative;
-  border-radius: 8px;
-}
-
-.scales-dropdown {
+.submissions-dropdown {
   position: absolute;
   top: 100%;
   left: 0;
@@ -378,8 +373,12 @@ ul > li {
   margin-top: 2px;
 }
 
-.scales-dropdown-item {
+.submissions-dropdown-item {
   padding: 8px;
   cursor: pointer;
   border-bottom: 1px solid #eee;
+}
+
+.submissions-dropdown-item:hover {
+  background-color: #eee;
 }

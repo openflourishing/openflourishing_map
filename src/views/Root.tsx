@@ -18,7 +18,7 @@ import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
 import imageMap from './imageMap';
 import SearchField from "./SearchField";
-import ScalesPanel from "./ScalesPanel";
+import SubmissionsPanel from "./SubmissionsPanel";
 import TagsPanel from "./TagsPanel";
 import dataset from "../dataset.json";
 
@@ -32,7 +32,7 @@ const Root: FC = () => {
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     tags: {},
-    selected_scales: new Set(),
+    selected_submissions: new Set(),
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const sigmaSettings: Partial<Settings> = useMemo(
@@ -61,11 +61,11 @@ const Root: FC = () => {
 
     const clusters = keyBy(dataset.clusters, "key");
     const tags = keyBy(dataset.tags, "key");
-
+    
     dataset.nodes.forEach((node) =>
       graph.addNode(node.key, {
         ...node,
-        scales: new Set(node.scales), // Convert to Set<string>
+        submissions: new Set(node.submissions), // Convert to Set<string>
         ...omit(clusters[node.cluster], "key"),
         image: imageMap[tags[node.tag].image],
       }),
@@ -91,13 +91,13 @@ const Root: FC = () => {
     setFiltersState({
       clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
       tags: mapValues(keyBy(dataset.tags, "key"), constant(true)),
-      selected_scales: new Set(),
+      selected_submissions: new Set(),
     });
     const safeDataset: Dataset = {
       ...dataset,
       nodes: dataset.nodes.map((node) => ({
-        ...node,
-        scales: new Set(node.scales),
+          ...node,
+          submissions: new Set(node.submissions),
       })),
       edges: dataset.edges.map(
         (edge) => [edge[0], edge[1]] as [string, string]
@@ -153,13 +153,13 @@ const Root: FC = () => {
               </div>
               <GraphTitle filters={filtersState} />
               <div className="panels">
-                <ScalesPanel
-                  network_scales={dataset.scales}
+                <SubmissionsPanel
+                  network_submissions={dataset.submissions}
                   filters={filtersState}
-                  setScales={(selected_scales) =>
+                  setSubmissions={(selected_submissions) =>
                     setFiltersState((filters) => ({
                       ...filters,
-                      selected_scales,
+                      selected_submissions,
                     }))
                   }
                 />
