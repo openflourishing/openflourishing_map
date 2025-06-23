@@ -18,6 +18,7 @@ import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
 import imageMap from './imageMap';
 import SearchField from "./SearchField";
+import ScalesPanel from "./ScalesPanel";
 import TagsPanel from "./TagsPanel";
 import dataset from "../dataset.json";
 
@@ -27,10 +28,11 @@ const Root: FC = () => {
   const graph = useMemo(() => new DirectedGraph(), []);
   const [showContents, setShowContents] = useState(false);
   const [dataReady, setDataReady] = useState(false);
-  const [_, setDataset] = useState<Dataset | null>(null);
+  const [datasetState, setDataset] = useState<Dataset | null>(null);
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     tags: {},
+    selected_scales: new Set(),
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const sigmaSettings: Partial<Settings> = useMemo(
@@ -55,7 +57,7 @@ const Root: FC = () => {
 
   // Load data on mount:
   useEffect(() => {
-    graph.clear(); // prevents duplicate nodes
+    if (datasetState !== null) return; // already set
 
     const clusters = keyBy(dataset.clusters, "key");
     const tags = keyBy(dataset.tags, "key");
@@ -63,6 +65,7 @@ const Root: FC = () => {
     dataset.nodes.forEach((node) =>
       graph.addNode(node.key, {
         ...node,
+        scales: new Set(node.scales), // Convert to Set<string>
         ...omit(clusters[node.cluster], "key"),
         image: imageMap[tags[node.tag].image],
       }),
@@ -88,16 +91,21 @@ const Root: FC = () => {
     setFiltersState({
       clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
       tags: mapValues(keyBy(dataset.tags, "key"), constant(true)),
+      selected_scales: new Set(),
     });
     const safeDataset: Dataset = {
       ...dataset,
+      nodes: dataset.nodes.map((node) => ({
+        ...node,
+        scales: new Set(node.scales),
+      })),
       edges: dataset.edges.map(
         (edge) => [edge[0], edge[1]] as [string, string]
       ),
     };
     setDataset(safeDataset);
     requestAnimationFrame(() => setDataReady(true));
-  }, []);
+  }, [datasetState]);
 
   if (!dataset) return null;
 
@@ -145,6 +153,16 @@ const Root: FC = () => {
               </div>
               <GraphTitle filters={filtersState} />
               <div className="panels">
+                <ScalesPanel
+                  network_scales={dataset.scales}
+                  filters={filtersState}
+                  setScales={(selected_scales) =>
+                    setFiltersState((filters) => ({
+                      ...filters,
+                      selected_scales,
+                    }))
+                  }
+                />
                 <SearchField filters={filtersState} />
                 <DescriptionPanel />
                 <ClustersPanel

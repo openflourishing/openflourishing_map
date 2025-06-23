@@ -336,3 +336,50 @@ ul > li {
     display: none !important;
   }
 }
+
+
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  background: #6ec966;
+  border-radius: 12px;
+  padding: 4px 8px;
+  margin: 8px 0;
+}
+
+.badge-remove {
+  margin-left: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.scales-input-wrapper {
+  position: relative;
+  border-radius: 8px;
+}
+
+.scales-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 2px;
+}
+
+.scales-dropdown-item {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
