@@ -45,12 +45,13 @@ const Root: FC = () => {
       defaultDrawNodeLabel: drawLabel,
       defaultDrawNodeHover: drawHover,
       defaultNodeType: "image",
-      defaultEdgeType: "arrow",
+      defaultEdgeType: "line",
       labelDensity: 0.07,
       labelGridCellSize: 60,
       labelRenderedSizeThreshold: 15,
       labelFont: "Lato, sans-serif",
       zIndex: true,
+      zoomToSizeRatioFunction: (ratio: number) => ratio,
     }),
     [],
   );
@@ -70,23 +71,13 @@ const Root: FC = () => {
         image: imageMap[tags[node.tag].image],
       }),
     );
-    dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
+    dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 0.1 }));
 
-    // Use degrees as node sizes:
-    const scores = graph.nodes().map((node) => graph.getNodeAttribute(node, "score"));
-    const minDegree = Math.min(...scores);
-    const maxDegree = Math.max(...scores);
-    const MIN_NODE_SIZE = 3;
-    const MAX_NODE_SIZE = 30;
-    graph.forEachNode((node) =>
-      graph.setNodeAttribute(
-        node,
-        "size",
-        ((graph.getNodeAttribute(node, "score") - minDegree) / (maxDegree - minDegree)) *
-          (MAX_NODE_SIZE - MIN_NODE_SIZE) +
-          MIN_NODE_SIZE,
-      ),
-    );
+    // Use size as node sizes:
+    graph.forEachNode((node) => {
+      const radius = (graph.getNodeAttribute(node, "size"));
+      graph.setNodeAttribute(node,"size", radius)
+    });
 
     setFiltersState({
       clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
