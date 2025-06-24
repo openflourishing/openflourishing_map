@@ -17,27 +17,27 @@ function matchesStart(search: string, submission: Submission): boolean {
 const SubmissionsPanel: FC<{
   network_submissions: Submission[];
   filters: FiltersState;
-  setSubmissions: (selected_submissions: Set<string>) => void;
+  setSubmissions: (selected_submissions: Set<number>) => void;
 }> = ({ network_submissions, setSubmissions }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
 
   const [search, setSearch] = useState("");
-  const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(new Set());
+  const [selectedSubmissions, setSelectedSubmissions] = useState<Set<number>>(new Set());
 
   const submissionMap = useMemo(() => {
     const map: Record<string, Submission> = {};
-    network_submissions.forEach((submission) => {
+    Object.values(network_submissions).forEach((submission) => {
       map[submission.key] = submission;
     });
     return map;
   }, [network_submissions]);
 
   const submissionToNodeIds = useMemo(() => {
-    const map: Record<string, Set<string>> = {};
+    const map: Record<number, Set<string>> = {};
     graph.forEachNode((node, attrs) => {
       const nodeSubmissions = attrs.submissions || [];
-      nodeSubmissions.forEach((submission: string) => {
+      nodeSubmissions.forEach((submission: number) => {
         if (!map[submission]) map[submission] = new Set();
         map[submission].add(node);
       });
@@ -52,7 +52,7 @@ const SubmissionsPanel: FC<{
     );
   }, [search, submissionMap, selectedSubmissions]);
 
-  const handleSelect = (submissionKey: string) => {
+  const handleSelect = (submissionKey: number) => {
     const updated = new Set(selectedSubmissions);
     updated.add(submissionKey);
     setSelectedSubmissions(updated);
@@ -66,7 +66,7 @@ const SubmissionsPanel: FC<{
     }
   };
 
-  const handleRemove = (submissionKey: string) => {
+  const handleRemove = (submissionKey: number) => {
     const updated = new Set(selectedSubmissions);
     updated.delete(submissionKey);
     setSelectedSubmissions(updated);
