@@ -125,7 +125,14 @@ const SubmissionsPanel: FC<{
                 onClick={() => handleSelect(submission.key)}
                 className="submissions-dropdown-item"
               >
-                <strong>{submission.scale_abbr}</strong>: {submission.scale_name} ({submission.citation})
+                <strong>
+                  {submission.scale_abbr == "none" 
+                  ? "" 
+                  : submission.scale_name + 
+                  submission.scale_abbr == "none" 
+                  ? "" 
+                  : " (" + submission.scale_abbr  + "): "}
+                </strong>{submission.citation}
               </li>
             ))}
           </ul>

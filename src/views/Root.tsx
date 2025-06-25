@@ -1,5 +1,6 @@
 import { FullScreenControl, SigmaContainer, ZoomControl } from "@react-sigma/core";
 import { createNodeImageProgram } from "@sigma/node-image";
+// import EdgeCurveProgram from "@sigma/edge-curve";
 import { DirectedGraph } from "graphology";
 import { constant, keyBy, mapValues, omit } from "lodash";
 import { FC, useEffect, useMemo, useState } from "react";
@@ -10,7 +11,7 @@ import { Settings } from "sigma/settings";
 
 import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState } from "../types";
-import ClustersPanel from "./ClustersPanel";
+// import ClustersPanel from "./ClustersPanel";
 import DescriptionPanel from "./DescriptionPanel";
 import GraphDataController from "./GraphDataController";
 import GraphEventsController from "./GraphEventsController";
@@ -52,6 +53,9 @@ const Root: FC = () => {
       labelFont: "Lato, sans-serif",
       zIndex: true,
       zoomToSizeRatioFunction: (ratio: number) => ratio,
+      // edgeProgramClasses: {
+      //   curved: EdgeCurveProgram,
+      // },
     }),
     [],
   );
@@ -60,6 +64,7 @@ const Root: FC = () => {
   useEffect(() => {
     if (datasetState !== null) return; // already set
 
+    const nodes_by_key = keyBy(dataset.nodes, "key");
     const clusters = keyBy(dataset.clusters, "key");
     const tags = keyBy(dataset.tags, "key");
     
@@ -71,11 +76,16 @@ const Root: FC = () => {
         image: imageMap[tags[node.tag].image],
       }),
     );
-    dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 0.1 }));
+    dataset.edges.forEach(([source, target]) => {
+      graph.addEdge(source, target, {
+          size: 0.05,
+          color: clusters[nodes_by_key[source].cluster].color,
+        })
+    });
 
     // Use size as node sizes:
     graph.forEachNode((node) => {
-      const radius = (graph.getNodeAttribute(node, "size"));
+      const radius = (graph.getNodeAttribute(node, "size"))**0.5 * 1;
       graph.setNodeAttribute(node,"size", radius)
     });
 
@@ -98,7 +108,7 @@ const Root: FC = () => {
     requestAnimationFrame(() => setDataReady(true));
   }, [datasetState]);
 
-  if (!dataset) return null;
+  if (!datasetState) return null;
 
   return (
     <div id="app-root" className={showContents ? "show-contents" : ""}>
@@ -145,7 +155,7 @@ const Root: FC = () => {
               <GraphTitle filters={filtersState} />
               <div className="panels">
                 <SubmissionsPanel
-                  network_submissions={dataset.submissions}
+                  network_submissions={datasetState.submissions}
                   filters={filtersState}
                   setSubmissions={(selected_submissions) =>
                     setFiltersState((filters) => ({
@@ -156,8 +166,8 @@ const Root: FC = () => {
                 />
                 <SearchField filters={filtersState} />
                 <DescriptionPanel />
-                <ClustersPanel
-                  clusters={dataset.clusters}
+                {/* <ClustersPanel
+                  clusters={datasetState.clusters}
                   filters={filtersState}
                   setClusters={(clusters) =>
                     setFiltersState((filters) => ({
@@ -173,9 +183,9 @@ const Root: FC = () => {
                         : { ...filters.clusters, [cluster]: true },
                     }));
                   }}
-                />
+                /> */}
                 <TagsPanel
-                  tags={dataset.tags}
+                  tags={datasetState.tags}
                   filters={filtersState}
                   setTags={(tags) =>
                     setFiltersState((filters) => ({
