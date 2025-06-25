@@ -11,7 +11,7 @@ import { Settings } from "sigma/settings";
 
 import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState } from "../types";
-// import ClustersPanel from "./ClustersPanel";
+import ClustersPanel from "./ClustersPanel";
 import DescriptionPanel from "./DescriptionPanel";
 import GraphDataController from "./GraphDataController";
 import GraphEventsController from "./GraphEventsController";
@@ -20,7 +20,7 @@ import GraphTitle from "./GraphTitle";
 import imageMap from './imageMap';
 import SearchField from "./SearchField";
 import SubmissionsPanel from "./SubmissionsPanel";
-import TagsPanel from "./TagsPanel";
+// import TagsPanel from "./TagsPanel";
 import dataset from "../dataset.json";
 
 
@@ -166,7 +166,7 @@ const Root: FC = () => {
                 />
                 <SearchField filters={filtersState} />
                 <DescriptionPanel />
-                {/* <ClustersPanel
+                <ClustersPanel
                   clusters={datasetState.clusters}
                   filters={filtersState}
                   setClusters={(clusters) =>
@@ -183,8 +183,8 @@ const Root: FC = () => {
                         : { ...filters.clusters, [cluster]: true },
                     }));
                   }}
-                /> */}
-                <TagsPanel
+                />
+                {/* <TagsPanel
                   tags={datasetState.tags}
                   filters={filtersState}
                   setTags={(tags) =>
@@ -199,7 +199,7 @@ const Root: FC = () => {
                       tags: filters.tags[tag] ? omit(filters.tags, tag) : { ...filters.tags, [tag]: true },
                     }));
                   }}
-                />
+                /> */}
               </div>
             </div>
           </>
