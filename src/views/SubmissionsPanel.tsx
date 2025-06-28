@@ -61,7 +61,9 @@ const SubmissionsPanel: FC<{
 
     if (submissionToNodeIds[submissionKey]) {
       submissionToNodeIds[submissionKey].forEach((node_id) => {
-        graph.setNodeAttribute(node_id, "highlighted", true);
+        const color = graph.getNodeAttribute(node_id, "color");
+        graph.setNodeAttribute(node_id, "color_backup", color);
+        graph.setNodeAttribute(node_id, "color", "#ebc934");
       });
     }
   };
@@ -73,8 +75,9 @@ const SubmissionsPanel: FC<{
     setSubmissions(updated);
 
     if (submissionToNodeIds[submissionKey]) {
-      submissionToNodeIds[submissionKey].forEach((node_id) => {
-        graph.setNodeAttribute(node_id, "highlighted", false);
+      submissionToNodeIds[submissionKey].forEach((node_id: string) => {
+        const color = graph.getNodeAttribute(node_id, "color_backup");
+        graph.setNodeAttribute(node_id, "color", color);
       });
     }
   };
