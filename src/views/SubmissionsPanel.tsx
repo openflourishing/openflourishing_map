@@ -109,7 +109,7 @@ const SubmissionsPanel: FC<{
       <div className="search-wrapper">
         <input
           type="search"
-          placeholder="Search for a submission..."
+          placeholder="Search for a source..."
           value={search}
           onChange={onInputChange}
           onKeyDown={onKeyDown}
