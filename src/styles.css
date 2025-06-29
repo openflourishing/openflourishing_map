@@ -59,9 +59,11 @@ body {
   height: 100vh;
   position: relative;
 }
+
 #app-root,
 .sigma-container {
   background: white;
+  height: 100%;
   position: absolute;
   inset: 0;
 }
