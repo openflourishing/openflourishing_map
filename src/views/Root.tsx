@@ -73,6 +73,7 @@ const Root: FC = () => {
         ...node,
         submissions: new Set(node.submissions), // Convert to Set<string>
         ...omit(clusters[node.cluster], "key"),
+        color_backup: clusters[node.cluster].color,
         image: imageMap[tags[node.tag].image],
       }),
     );

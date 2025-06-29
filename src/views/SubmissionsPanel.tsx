@@ -61,8 +61,6 @@ const SubmissionsPanel: FC<{
 
     if (submissionToNodeIds[submissionKey]) {
       submissionToNodeIds[submissionKey].forEach((node_id) => {
-        const color = graph.getNodeAttribute(node_id, "color");
-        graph.setNodeAttribute(node_id, "color_backup", color);
         graph.setNodeAttribute(node_id, "color", "#ebc934");
       });
     }

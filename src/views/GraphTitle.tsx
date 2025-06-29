@@ -26,7 +26,7 @@ const GraphTitle: FC<{ filters: FiltersState }> = ({ filters }) => {
 
   return (
     <div className="graph-title">
-      <h1>A cartography of concepts on human flourishing</h1>
+      <h1>A map of concepts on human flourishing</h1>
       <h2>
         <i>
           {graph.order} node{graph.order > 1 ? "s" : ""}{" "}

@@ -39,14 +39,14 @@ const DescriptionPanel: FC = () => {
         </a>
         , using{" "}
         <a target="_blank" rel="noreferrer" href="https://reactjs.org/">
-          react
+          React
         </a>{" "}
         based on the{" "}
         <a target="_blank" rel="noreferrer" href="https://www.sigmajs.org">
-          sigma.js
+          sigma.js{" "}
         </a>
         package. You can read the source code{" "}
-        <a target="_blank" rel="noreferrer" href="https://github.com/jacomyal/sigma.js/tree/main/packages/demo">
+        <a target="_blank" rel="noreferrer" href="https://github.com/openflourishing">
           on GitHub
         </a>
         .
