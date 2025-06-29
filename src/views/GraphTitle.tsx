@@ -2,6 +2,7 @@ import { useSigma } from "@react-sigma/core";
 import { FC, useEffect, useState } from "react";
 
 import { FiltersState } from "../types";
+import logo from '../assets/images/logo.png';
 
 function prettyPercentage(val: number): string {
   return (val * 100).toFixed(1) + "%";
@@ -26,7 +27,10 @@ const GraphTitle: FC<{ filters: FiltersState }> = ({ filters }) => {
 
   return (
     <div className="graph-title">
-      <h1>A map of concepts on human flourishing</h1>
+      <a href="https://openflourishing.org">
+        <img src={logo} alt="Logo" className="graph-logo" />
+      </a>
+      <h1>Concept map</h1>
       <h2>
         <i>
           {graph.order} node{graph.order > 1 ? "s" : ""}{" "}

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Lora&family=Public+Sans:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:ital@0;1&display=swap");
 
 /**
  * VARIABLES:
@@ -23,26 +23,26 @@
  * BASE STYLES:
  * ************
  */
-body {
-  font-family: "Public Sans", sans-serif;
+#app-root {
+  font-family: "Work Sans", sans-serif;
   font-size: 0.9em;
   overflow: hidden;
 }
-h1,
-h2 {
-  font-family: Lora, serif;
+#app-root h1,
+#app-root h2 {
+  font-family: "Work Sans", serif;
 }
-h2 {
+#app-root h2 {
   font-size: 1.3em;
   margin: 0;
 }
-h2 > * {
+#app-root h2 > * {
   vertical-align: text-top;
 }
-a {
+#app-root a {
   color: black !important;
 }
-a:hover {
+#app-root a:hover {
   opacity: var(--hover-opacity);
 }
 
@@ -91,6 +91,13 @@ body {
   margin: 0;
   background: var(--transparent-white);
 }
+
+
+.graph-logo {
+  height: 57px;  /* Adjust as needed */
+  width: auto;
+}
+
 .panels {
   position: absolute;
   bottom: 0;
