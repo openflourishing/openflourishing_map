@@ -1,5 +1,5 @@
 import { FC, useState, useMemo, ChangeEvent, KeyboardEvent } from "react";
-import { useSigma } from "@react-sigma/core";
+import { useSigma} from "@react-sigma/core";
 import { GrClose } from "react-icons/gr";
 import { BsSearch } from "react-icons/bs";
 import { Submission, FiltersState } from "../types";
@@ -59,11 +59,18 @@ const SubmissionsPanel: FC<{
     setSubmissions(updated);
     setSearch("");
 
-    if (submissionToNodeIds[submissionKey]) {
-      submissionToNodeIds[submissionKey].forEach((node_id) => {
-        graph.setNodeAttribute(node_id, "color", "#ebc934");
+    graph.forEachNode((node) => {
+      graph.setNodeAttribute(node, "color", "#dddddd");
+    });
+    updated.forEach((subKey) => {
+      submissionToNodeIds[subKey].forEach((node_id) => {
+        const color = graph.getNodeAttribute(node_id, "color_backup");
+        graph.setNodeAttribute(node_id, "color", color);
       });
-    }
+    });
+    graph.forEachEdge((edge) => {
+      graph.setEdgeAttribute(edge, "hidden", true);
+    });
   };
 
   const handleRemove = (submissionKey: number) => {
@@ -71,11 +78,23 @@ const SubmissionsPanel: FC<{
     updated.delete(submissionKey);
     setSelectedSubmissions(updated);
     setSubmissions(updated);
-
-    if (submissionToNodeIds[submissionKey]) {
-      submissionToNodeIds[submissionKey].forEach((node_id: string) => {
+    if (updated.size > 0) {
+      graph.forEachNode((node) => {
+        graph.setNodeAttribute(node, "color", "#dddddd");
+      });
+      updated.forEach((subKey) => {
+        submissionToNodeIds[subKey].forEach((node_id) => {
+          const color = graph.getNodeAttribute(node_id, "color_backup");
+          graph.setNodeAttribute(node_id, "color", color);
+        });
+      });
+    } else {
+      graph.forEachNode((node_id) => {
         const color = graph.getNodeAttribute(node_id, "color_backup");
         graph.setNodeAttribute(node_id, "color", color);
+      });
+      graph.forEachEdge((edge) => {
+        graph.setEdgeAttribute(edge, "hidden", false);
       });
     }
   };
