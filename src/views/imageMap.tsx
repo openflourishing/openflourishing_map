@@ -8,6 +8,7 @@ import organization from '../assets/images/organization.svg';
 import person from '../assets/images/person.svg';
 import technology from '../assets/images/technology.svg';
 import tool from '../assets/images/tool.svg';
+import undefined from '../assets/images/undefined.svg';
 import unknown from '../assets/images/unknown.svg';
 
 const imageMap: Record<string, string> = {
@@ -21,6 +22,7 @@ const imageMap: Record<string, string> = {
   "person.svg": person,
   "technology.svg": technology,
   "tool.svg": tool,
+  "undefined.svg": undefined,
   "unknown.svg": unknown,
 };
 

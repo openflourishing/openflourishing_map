@@ -81285,107 +81285,107 @@
   "clusters": [
     {
       "key": "0",
-      "color": "#4047B1",
+      "color": "#5B57D8",
       "clusterLabel": "Relationships, Family, Love and Friendship"
     },
     {
       "key": "1",
-      "color": "#71B2AC",
+      "color": "#74E45E",
       "clusterLabel": "Physical health, Vitality, Health and Physical wellbeing"
     },
     {
       "key": "2",
-      "color": "#B04389",
+      "color": "#F06059",
       "clusterLabel": "Happiness, Anxiety, Positive affect and Depression"
     },
     {
       "key": "3",
-      "color": "#3F5B3E",
+      "color": "#5CD2FC",
       "clusterLabel": "Coping, Problem-solving, Avoidance coping and Avoidance"
     },
     {
       "key": "4",
-      "color": "#3CB245",
+      "color": "#E98AFD",
       "clusterLabel": "Self-efficacy, Competence, Achievement and Accomplishment"
     },
     {
       "key": "5",
-      "color": "#B18D8B",
+      "color": "#FCD26D",
       "clusterLabel": "Optimism, Resilience, Hope and Acceptance"
     },
     {
       "key": "6",
-      "color": "#448782",
+      "color": "#717864",
       "clusterLabel": "Autonomy, Control, Personal growth and Challenge"
     },
     {
       "key": "7",
-      "color": "#853D3D",
+      "color": "#ADB9B2",
       "clusterLabel": "Spirituality, Comfort, Spiritual wellbeing and Faith"
     },
     {
       "key": "8",
-      "color": "#84B059",
+      "color": "#BD62AD",
       "clusterLabel": "Meaning, Purpose, Development and Worthwhileness"
     },
     {
       "key": "9",
-      "color": "#8068AE",
+      "color": "#908FFB",
       "clusterLabel": "Engagement, Enjoyment, Pleasure and Interest"
     },
     {
       "key": "10",
-      "color": "#797A58",
+      "color": "#B2B055",
       "clusterLabel": "Work, Community, Contribution and Community connectedness"
     },
     {
       "key": "11",
-      "color": "#654B79",
+      "color": "#AAF4EB",
       "clusterLabel": "Security, Safety, Money and Standard of living"
     },
     {
       "key": "12",
-      "color": "#AA6448",
+      "color": "#57A2B1",
       "clusterLabel": "Regret, Feeling upset, Responsibility and Resiliency"
     },
     {
       "key": "13",
-      "color": "#4AB186",
+      "color": "#55FAB1",
       "clusterLabel": "National wellbeing, Economy, Environment and Arts"
     },
     {
       "key": "14",
-      "color": "#7B3DB1",
+      "color": "#B3FC89",
       "clusterLabel": "Active-antisocial coping, Antisocial action, Aggressive action and Instinctive action"
     },
     {
       "key": "15",
-      "color": "#43863C",
+      "color": "#FC98A0",
       "clusterLabel": "Citizenship, Intimate relations, Couples and Marriage"
     },
     {
       "key": "16",
-      "color": "#809087",
+      "color": "#FECFC9",
       "clusterLabel": "Making the best of life circumstances, Life circumstances, Making the best of past life circumstnaces and Making the best of present life circumstances"
     },
     {
       "key": "17",
-      "color": "#5C8AB1",
+      "color": "#CBC3FA",
       "clusterLabel": "Physical affection, Physical touch, Touch and Lack of physical touch"
     },
     {
       "key": "18",
-      "color": "#A6B2AE",
+      "color": "#A156F7",
       "clusterLabel": "Cognitive restructuring, Changing beliefs, Enquiry and Feedback-seeking"
     },
     {
       "key": "19",
-      "color": "#9B687E",
+      "color": "#5DAE64",
       "clusterLabel": "Meeting others, Socializing, Doing things"
     },
     {
       "key": "20",
-      "color": "#B1A94B",
+      "color": "#F6FDA4",
       "clusterLabel": "Eudiamonic wellbieng, Eudemonic wellbeing, Eudiamonia"
     }
   ],
@@ -81400,7 +81400,7 @@
     },
     {
       "key": "Concept",
-      "image": "concept.svg"
+      "image": "undefined.svg"
     },
     {
       "key": "Field",
@@ -81431,7 +81431,7 @@
       "image": "tool.svg"
     },
     {
-      "key": "unknown",
+      "key": "Unknown",
       "image": "unknown.svg"
     }
   ],

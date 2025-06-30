@@ -86,7 +86,7 @@ const Root: FC = () => {
 
     // Use size as node sizes:
     graph.forEachNode((node) => {
-      const radius = (graph.getNodeAttribute(node, "size"))**0.5 * 1;
+      const radius = (graph.getNodeAttribute(node, "size"))**0.5 * 0.5;
       graph.setNodeAttribute(node,"size", radius)
     });
 
