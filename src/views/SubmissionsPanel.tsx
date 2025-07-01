@@ -60,7 +60,7 @@ const SubmissionsPanel: FC<{
     setSearch("");
 
     graph.forEachNode((node) => {
-      graph.setNodeAttribute(node, "color", "#dddddd");
+      graph.setNodeAttribute(node, "color", "#cccccc");
     });
     updated.forEach((subKey) => {
       submissionToNodeIds[subKey].forEach((node_id) => {
@@ -80,7 +80,7 @@ const SubmissionsPanel: FC<{
     setSubmissions(updated);
     if (updated.size > 0) {
       graph.forEachNode((node) => {
-        graph.setNodeAttribute(node, "color", "#dddddd");
+        graph.setNodeAttribute(node, "color", "#cccccc");
       });
       updated.forEach((subKey) => {
         submissionToNodeIds[subKey].forEach((node_id) => {

@@ -24,6 +24,33 @@ import SubmissionsPanel from "./SubmissionsPanel";
 import dataset from "../dataset.json";
 
 
+function LightenDarkenColor(col, amt) {
+    var usePound = false;
+    if ( col[0] == "#" ) {
+        col = col.slice(1);
+        usePound = true;
+    }
+
+    var num = parseInt(col,16);
+
+    var r = (num >> 16) + amt;
+
+    if ( r > 255 ) r = 255;
+    else if  (r < 0) r = 0;
+
+    var b = ((num >> 8) & 0x00FF) + amt;
+
+    if ( b > 255 ) b = 255;
+    else if  (b < 0) b = 0;
+    
+    var g = (num & 0x0000FF) + amt;
+
+    if ( g > 255 ) g = 255;
+    else if  ( g < 0 ) g = 0;
+
+    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+}
+
 
 const Root: FC = () => {
   const graph = useMemo(() => new DirectedGraph(), []);
@@ -49,10 +76,11 @@ const Root: FC = () => {
       defaultEdgeType: "line",
       labelDensity: 0.07,
       labelGridCellSize: 60,
-      labelRenderedSizeThreshold: 15,
-      labelFont: "Lato, sans-serif",
+      labelRenderedSizeThreshold: 5,
+      labelFont: "Work Sans, sans-serif",
       zIndex: true,
       zoomToSizeRatioFunction: (ratio: number) => ratio,
+      itemSizesReference : "positions",
       // edgeProgramClasses: {
       //   curved: EdgeCurveProgram,
       // },
@@ -80,13 +108,13 @@ const Root: FC = () => {
     dataset.edges.forEach(([source, target]) => {
       graph.addEdge(source, target, {
           size: 0.05,
-          color: clusters[nodes_by_key[source].cluster].color,
+          color: LightenDarkenColor(clusters[nodes_by_key[source].cluster].color, 70),
         })
     });
 
     // Use size as node sizes:
     graph.forEachNode((node) => {
-      const radius = (graph.getNodeAttribute(node, "size"))**0.5 * 0.5;
+      const radius = (graph.getNodeAttribute(node, "size")) * 2.0;
       graph.setNodeAttribute(node,"size", radius)
     });
 
