@@ -32,6 +32,8 @@ export interface Submission {
   isbn: string;
   context: string;
   notes: string;
+  language: string;
+  type: string;
 }
 
 
