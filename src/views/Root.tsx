@@ -10,7 +10,7 @@ import { GrClose } from "react-icons/gr";
 import { Settings } from "sigma/settings";
 
 import { drawHover, drawLabel } from "../canvas-utils";
-import { Dataset, FiltersState } from "../types";
+import { Dataset, FiltersState, Item } from "../types";
 import ClustersPanel from "./ClustersPanel";
 import DescriptionPanel from "./DescriptionPanel";
 import GraphDataController from "./GraphDataController";
@@ -18,11 +18,15 @@ import GraphEventsController from "./GraphEventsController";
 import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
 import imageMap from './imageMap';
+import ItemsPanel from "./ItemsPanel";
 import SearchField from "./SearchField";
 import SubmissionsPanel from "./SubmissionsPanel";
 // import TagsPanel from "./TagsPanel";
 import dataset from "../dataset.json";
+import item_pool from "../item_pool.json";
 
+// Type assertion for item_pool to ensure type safety
+const typedItemPool: Record<string, Item[]> = item_pool as Record<string, Item[]>;
 
 function LightenDarkenColor(col, amt) {
     var usePound = false;
@@ -63,6 +67,7 @@ const Root: FC = () => {
     selected_submissions: new Set(),
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
       nodeProgramClasses: {
@@ -103,6 +108,7 @@ const Root: FC = () => {
         ...omit(clusters[node.cluster], "key"),
         color_backup: clusters[node.cluster].color,
         image: imageMap[tags[node.tag].image],
+        items: typedItemPool[node.label] || [], // Add items from item_pool based on node label
       }),
     );
     dataset.edges.forEach(([source, target]) => {
@@ -128,6 +134,7 @@ const Root: FC = () => {
       nodes: dataset.nodes.map((node) => ({
           ...node,
           submissions: new Set(node.submissions),
+          items: typedItemPool[node.label] || [], // Add items from item_pool based on node label
       })),
       edges: dataset.edges.map(
         (edge) => [edge[0], edge[1]] as [string, string]
@@ -143,7 +150,7 @@ const Root: FC = () => {
     <div id="app-root" className={showContents ? "show-contents" : ""}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
         <GraphSettingsController hoveredNode={hoveredNode} />
-        <GraphEventsController setHoveredNode={setHoveredNode} />
+        <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
         <GraphDataController filters={filtersState} />
 
         {dataReady && (
@@ -195,6 +202,7 @@ const Root: FC = () => {
                 />
                 <SearchField filters={filtersState} />
                 <DescriptionPanel />
+                <ItemsPanel selectedNode={selectedNode} />
                 <ClustersPanel
                   clusters={datasetState.clusters}
                   filters={filtersState}

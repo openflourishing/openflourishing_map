@@ -7,6 +7,7 @@ export interface NodeData {
   submissions: Set<number>;
   x: number;
   y: number;
+  items: Item[];
 }
 
 export interface Cluster {
@@ -50,3 +51,17 @@ export interface FiltersState {
   tags: Record<string, boolean>;
   selected_submissions: Set<number>;
 }
+
+
+export interface Item {
+  item: string;
+  level: string
+  tense: string;
+  response_categories: string[];
+  direction: number;
+  context: string;
+  contributor_id: number;
+  ai_drafted: boolean;
+  edited: boolean;
+}
+
