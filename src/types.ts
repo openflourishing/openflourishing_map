@@ -40,7 +40,7 @@ export interface Submission {
 
 export interface Dataset {
   nodes: NodeData[];
-  edges: [string, string][];
+  edges: [string, string, number][];
   clusters: Cluster[];
   tags: Tag[];
   submissions: Submission[];

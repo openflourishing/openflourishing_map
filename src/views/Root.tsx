@@ -111,10 +111,11 @@ const Root: FC = () => {
         items: typedItemPool[node.label] || [], // Add items from item_pool based on node label
       }),
     );
-    dataset.edges.forEach(([source, target]) => {
+    dataset.edges.forEach(([source, target, weight]) => {
       graph.addEdge(source, target, {
           size: 0.05,
           color: LightenDarkenColor(clusters[nodes_by_key[source].cluster].color, 70),
+          weight: weight, // Add the weight as an edge attribute
         })
     });
 
@@ -137,7 +138,7 @@ const Root: FC = () => {
           items: typedItemPool[node.label] || [], // Add items from item_pool based on node label
       })),
       edges: dataset.edges.map(
-        (edge) => [edge[0], edge[1]] as [string, string]
+        (edge) => [edge[0], edge[1], edge[2]] as [string, string, number]
       ),
     };
     setDataset(safeDataset);

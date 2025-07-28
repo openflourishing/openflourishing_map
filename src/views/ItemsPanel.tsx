@@ -75,21 +75,39 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
   const filteredSelectedItems = filterItems(selectedNodeItems);
   
   // Get items for the 5 most closely linked neighbors
-  const getNeighborItems = (): { neighbor: string; items: Item[]; originalCount: number }[] => {
+  const getNeighborItems = (): { neighbor: string; items: Item[]; originalCount: number; weight: number }[] => {
     if (!selectedNode) return [];
     
     const neighbors = graph.neighbors(selectedNode);
     
-    // Get all neighbor items with their labels and apply filters
+    // Get all neighbor items with their labels, weights, and apply filters
     const neighborItems = neighbors.map(neighbor => {
       const originalItems = graph.getNodeAttribute(neighbor, "items") || [];
       const filteredItems = filterItems(originalItems);
+      
+      // Get the edge weight between selectedNode and this neighbor
+      // Try both directions since the graph might be directed
+      let edgeWeight = 0;
+      try {
+        if (graph.hasEdge(selectedNode, neighbor)) {
+          edgeWeight = graph.getEdgeAttribute(selectedNode, neighbor, "weight") || 0;
+        } else if (graph.hasEdge(neighbor, selectedNode)) {
+          edgeWeight = graph.getEdgeAttribute(neighbor, selectedNode, "weight") || 0;
+        }
+      } catch (error) {
+        console.warn("Could not find edge weight between", selectedNode, "and", neighbor);
+        edgeWeight = 0;
+      }
+      
       return {
         neighbor: graph.getNodeAttribute(neighbor, "label") || neighbor,
         items: filteredItems,
-        originalCount: originalItems.length
+        originalCount: originalItems.length,
+        weight: edgeWeight
       };
-    }).slice(0, 5); // Take first 5 neighbors
+    })
+    .sort((a, b) => b.weight - a.weight) // Sort by weight in descending order (highest weight first)
+    .slice(0, 5); // Take top 5 neighbors by weight
     
     return neighborItems;
   };
@@ -209,17 +227,17 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
           
           {neighborItems.length > 0 && (
             <div style={{ marginTop: "1.5rem" }}>
-              <h5>Related Items from Neighbors</h5>
-              {neighborItems.map(({ neighbor, items, originalCount }, neighborIndex) => (
+              <h5>Related Items from Neighbors (sorted by connection strength)</h5>
+              {neighborItems.map(({ neighbor, items, originalCount, weight }, neighborIndex) => (
                 items.length > 0 && (
                   <div key={neighborIndex} style={{ marginBottom: "1rem" }}>
                     <h6 style={{ color: "#555", fontSize: "0.9em" }}>
                       {neighbor} 
-                      {originalCount !== items.length && (
-                        <small style={{ color: "#999", fontWeight: "normal" }}>
-                          ({items.length} of {originalCount})
-                        </small>
-                      )}
+                      <small style={{ color: "#999", fontWeight: "normal" }}>
+                        (weight: {weight.toFixed(2)}
+                        {originalCount !== items.length && `, ${items.length} of ${originalCount} items`}
+                        {originalCount === items.length && `, ${items.length} items`})
+                      </small>
                     </h6>
                     <ul style={{ fontSize: "0.8em" }}>
                       {items.slice(0, 3).map((item, index) => (
