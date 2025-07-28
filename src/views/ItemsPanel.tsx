@@ -225,7 +225,7 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
                   onChange={(e) => setFilters(prev => ({ ...prev, showOnlyEdited: e.target.checked }))}
                   style={{ marginRight: "5px" }}
                 />
-                Only show human-edited items
+                Only show human-reviewed/edited items
               </label>
             </div>
             <button
