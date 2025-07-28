@@ -14,6 +14,9 @@ interface FilterState {
   level: string;
   tense: string;
   context: string;
+  showNeighborHeadings: boolean;
+  showAiDrafted: boolean;
+  showOnlyEdited: boolean;
 }
 
 const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
@@ -23,7 +26,10 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
   const [filters, setFilters] = useState<FilterState>({
     level: "all",
     tense: "all",
-    context: "all"
+    context: "all",
+    showNeighborHeadings: true,
+    showAiDrafted: true,
+    showOnlyEdited: false
   });
 
   // Get items for the selected node
@@ -34,7 +40,7 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
     const items = [...selectedNodeItems];
     // Add neighbor items for filter options
     if (selectedNode) {
-      const neighbors = graph.neighbors(selectedNode);
+      const neighbors = graph.neighbors(selectedNode).filter(neighbor => neighbor !== selectedNode);
       neighbors.slice(0, 5).forEach(neighbor => {
         const neighborItems = graph.getNodeAttribute(neighbor, "items") || [];
         items.push(...neighborItems);
@@ -67,6 +73,8 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
       if (filters.level !== "all" && item.level !== filters.level) return false;
       if (filters.tense !== "all" && item.tense !== filters.tense) return false;
       if (filters.context !== "all" && item.context !== filters.context) return false;
+      if (!filters.showAiDrafted && item.ai_drafted) return false;
+      if (filters.showOnlyEdited && !item.edited) return false;
       return true;
     });
   };
@@ -78,7 +86,7 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
   const getNeighborItems = (): { neighbor: string; items: Item[]; originalCount: number; weight: number }[] => {
     if (!selectedNode) return [];
     
-    const neighbors = graph.neighbors(selectedNode);
+    const neighbors = graph.neighbors(selectedNode).filter(neighbor => neighbor !== selectedNode);
     
     // Get all neighbor items with their labels, weights, and apply filters
     const neighborItems = neighbors.map(neighbor => {
@@ -118,7 +126,10 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
     setFilters({
       level: "all",
       tense: "all", 
-      context: "all"
+      context: "all",
+      showNeighborHeadings: true,
+      showAiDrafted: true,
+      showOnlyEdited: false
     });
   };
 
@@ -184,6 +195,39 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
                 </select>
               </div>
             </div>
+            <div style={{ marginTop: "8px" }}>
+              <label style={{ display: "flex", alignItems: "center", fontSize: "0.8em", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={filters.showNeighborHeadings}
+                  onChange={(e) => setFilters(prev => ({ ...prev, showNeighborHeadings: e.target.checked }))}
+                  style={{ marginRight: "5px" }}
+                />
+                Show neighbor headings
+              </label>
+            </div>
+            <div style={{ marginTop: "4px" }}>
+              <label style={{ display: "flex", alignItems: "center", fontSize: "0.8em", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={filters.showAiDrafted}
+                  onChange={(e) => setFilters(prev => ({ ...prev, showAiDrafted: e.target.checked }))}
+                  style={{ marginRight: "5px" }}
+                />
+                Show AI drafted items
+              </label>
+            </div>
+            <div style={{ marginTop: "4px" }}>
+              <label style={{ display: "flex", alignItems: "center", fontSize: "0.8em", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={filters.showOnlyEdited}
+                  onChange={(e) => setFilters(prev => ({ ...prev, showOnlyEdited: e.target.checked }))}
+                  style={{ marginRight: "5px" }}
+                />
+                Only show human-edited items
+              </label>
+            </div>
             <button
               onClick={resetFilters}
               style={{
@@ -203,13 +247,10 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
           {filteredSelectedItems.length > 0 ? (
             <div>
               <h5>Items ({filteredSelectedItems.length}{selectedNodeItems.length !== filteredSelectedItems.length ? ` of ${selectedNodeItems.length}` : ''})</h5>
-              <ul style={{ fontSize: "0.9em", marginBottom: "1rem" }}>
+              <ul style={{ fontSize: "0.9em", marginBottom: "0.4rem" }}>
                 {filteredSelectedItems.slice(0, 10).map((item, index) => (
-                  <li key={index} style={{ marginBottom: "0.5rem" }}>
+                  <li key={index} style={{ marginBottom: "0.2rem" }}>
                     "{item.item}" 
-                    <small style={{ color: "#666", display: "block" }}>
-                      {item.level} • {item.tense} • {item.context}
-                    </small>
                   </li>
                 ))}
               </ul>
@@ -226,34 +267,33 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
           )}
           
           {neighborItems.length > 0 && (
-            <div style={{ marginTop: "1.5rem" }}>
-              <h5>Related Items from Neighbors (sorted by connection strength)</h5>
+            <div>
+              {filters.showNeighborHeadings && (<h5>Items from Neighbors</h5>)
+              }
               {neighborItems.map(({ neighbor, items, originalCount, weight }, neighborIndex) => (
                 items.length > 0 && (
-                  <div key={neighborIndex} style={{ marginBottom: "1rem" }}>
-                    <h6 style={{ color: "#555", fontSize: "0.9em" }}>
-                      {neighbor} 
-                      <small style={{ color: "#999", fontWeight: "normal" }}>
-                        (weight: {weight.toFixed(2)}
-                        {originalCount !== items.length && `, ${items.length} of ${originalCount} items`}
-                        {originalCount === items.length && `, ${items.length} items`})
-                      </small>
-                    </h6>
-                    <ul style={{ fontSize: "0.8em" }}>
-                      {items.slice(0, 3).map((item, index) => (
+                  <div key={neighborIndex} style={{ marginBottom: filters.showNeighborHeadings ? "0.2rem" : "0" }}>
+                    {filters.showNeighborHeadings && (
+                      <h6 style={{ color: "#555", fontSize: "0.9em", marginTop: "1rem" , marginBottom: "0.5rem" }}>
+                        {neighbor} 
+                        <small style={{ color: "#999", fontWeight: "normal" }}>
+                          {" "}(edge weight: {weight.toFixed(2)}
+                          {originalCount !== items.length && `, ${items.length} of ${originalCount} items`}
+                          {originalCount === items.length && `, ${items.length} items`})
+                        </small>
+                      </h6>
+                    )}
+                    <ul style={{ 
+                      fontSize: "0.8em", 
+                      marginTop: filters.showNeighborHeadings ? "0" : "0",
+                      marginBottom: filters.showNeighborHeadings ? "0" : "0"
+                    }}>
+                      {items.map((item, index) => (
                         <li key={index} style={{ marginBottom: "0.3rem" }}>
                           "{item.item}"
-                          <small style={{ color: "#666", display: "block" }}>
-                            {item.level} • {item.context}
-                          </small>
                         </li>
                       ))}
                     </ul>
-                    {items.length > 3 && (
-                      <small style={{ color: "#666" }}>
-                        ... and {items.length - 3} more items
-                      </small>
-                    )}
                   </div>
                 )
               ))}

@@ -108,7 +108,7 @@ const Root: FC = () => {
         ...omit(clusters[node.cluster], "key"),
         color_backup: clusters[node.cluster].color,
         image: imageMap[tags[node.tag].image],
-        items: typedItemPool[node.label] || [], // Add items from item_pool based on node label
+        items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
       }),
     );
     dataset.edges.forEach(([source, target, weight]) => {
@@ -135,7 +135,7 @@ const Root: FC = () => {
       nodes: dataset.nodes.map((node) => ({
           ...node,
           submissions: new Set(node.submissions),
-          items: typedItemPool[node.label] || [], // Add items from item_pool based on node label
+          items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
       })),
       edges: dataset.edges.map(
         (edge) => [edge[0], edge[1], edge[2]] as [string, string, number]
