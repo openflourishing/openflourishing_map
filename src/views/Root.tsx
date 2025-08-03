@@ -113,7 +113,7 @@ const Root: FC = () => {
     );
     dataset.edges.forEach(([source, target, weight]) => {
       graph.addEdge(source, target, {
-          size: Number(weight) * 0.25, // Scale edge thickness by weight (increased scaling for better visibility)
+          size: Number(weight) * 0.1, // Scale edge thickness by weight (increased scaling for better visibility)
           color: LightenDarkenColor(clusters[nodes_by_key[source].cluster].color, 70),
           weight: weight, // Add the weight as an edge attribute
         })

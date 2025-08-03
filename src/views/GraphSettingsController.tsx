@@ -40,7 +40,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
       edgeReducer: (edge: string, data: Attributes) => {
         if (debouncedHoveredNode) {
           return graph.hasExtremity(edge, debouncedHoveredNode)
-            ? { ...data, color: hoveredColor, size: data.size * 2 } // Scale up the original size instead of fixed 0.3
+            ? { ...data, color: hoveredColor, size: data.size * 1.5 } // Scale up the original size instead of fixed 0.3
             : { ...data, color: EDGE_FADE_COLOR, hidden: true };
         }
         return data;
@@ -71,7 +71,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
       debouncedHoveredNode
         ? (edge, data) =>
             graph.hasExtremity(edge, debouncedHoveredNode)
-              ? { ...data, color: hoveredColor, size: data.size * 2 } // Scale up the original size instead of fixed 0.3
+              ? { ...data, color: hoveredColor, size: data.size * 1.5 } // Scale up the original size instead of fixed 0.3
               : { ...data, color: EDGE_FADE_COLOR, hidden: true }
         : null,
     );

@@ -24,7 +24,7 @@ export interface Tag {
 export interface Submission {
   key: number;
   datetime: string;
-  contributor_id: number
+  contributor_ids: string
   citation: string;
   scale_name: string;
   scale_abbr: string;
@@ -60,7 +60,7 @@ export interface Item {
   response_categories: string[];
   direction: number;
   context: string;
-  contributor_id: number;
+  item_submission_id: number;
   ai_drafted: boolean;
   edited: boolean;
 }
