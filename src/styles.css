@@ -391,3 +391,80 @@ ul > li {
 .submissions-dropdown-item:hover {
   background-color: #eee;
 }
+
+/**
+ * DARK THEME:
+ * ***********
+ */
+.dark-theme {
+  --transparent-white: #000000cc;
+  --transparent-black: #ffffffcc;
+}
+
+.dark-theme #app-root,
+.dark-theme .sigma-container {
+  background: #000 !important;
+}
+
+.dark-theme #app-root a {
+  color: #fff !important;
+}
+
+.dark-theme .graph-title h1,
+.dark-theme .graph-title h2 {
+  background: var(--transparent-white);
+  color: #fff;
+}
+
+.dark-theme .contents {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.dark-theme .panel {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.dark-theme .buttons .btn {
+  background: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+.dark-theme .buttons .btn:hover {
+  background: #444;
+}
+
+.dark-theme input[type="text"],
+.dark-theme input[type="search"] {
+  background: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+.dark-theme .submissions-dropdown {
+  background: #2a2a2a;
+  border-color: #555;
+  color: #fff;
+}
+
+.dark-theme .submissions-dropdown-item {
+  border-bottom-color: #444;
+}
+
+.dark-theme .submissions-dropdown-item:hover {
+  background-color: #333;
+}
+
+.dark-theme .caption-row label {
+  color: #fff;
+}
+
+.dark-theme .text-muted {
+  color: #999 !important;
+}
+
+.dark-theme .circle {
+  border: 1px solid #555;
+}
