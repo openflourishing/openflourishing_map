@@ -12,6 +12,7 @@ import { Settings } from "sigma/settings";
 import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState, Item } from "../types";
 import ClustersPanel from "./ClustersPanel";
+import ContextsPanel from "./ContextsPanel";
 import DescriptionPanel from "./DescriptionPanel";
 import GraphDataController from "./GraphDataController";
 import GraphEventsController from "./GraphEventsController";
@@ -61,9 +62,11 @@ const Root: FC = () => {
   const [showContents, setShowContents] = useState(false);
   const [dataReady, setDataReady] = useState(false);
   const [datasetState, setDataset] = useState<Dataset | null>(null);
+  const [contextsList, setContextsList] = useState<Array<{ key: string; label: string }>>([]);
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     tags: {},
+    contexts: {},
     selected_submissions: new Set(),
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -100,17 +103,29 @@ const Root: FC = () => {
     const nodes_by_key = keyBy(dataset.nodes, "key");
     const clusters = keyBy(dataset.clusters, "key");
     const tags = keyBy(dataset.tags, "key");
+    const submissions_by_key = keyBy(dataset.submissions, "key");
     
-    dataset.nodes.forEach((node) =>
+    dataset.nodes.forEach((node) => {
+      // Gather all contexts from this node's submissions
+      const nodeContexts = new Set<string>();
+      node.submissions.forEach((submissionId) => {
+        const submission = submissions_by_key[submissionId];
+        if (submission && submission.context) {
+          const contextTags = submission.context.split(',').map((c) => c.trim());
+          contextTags.forEach((ctx) => nodeContexts.add(ctx));
+        }
+      });
+      
       graph.addNode(node.key, {
         ...node,
         submissions: new Set(node.submissions), // Convert to Set<string>
+        contexts: Array.from(nodeContexts), // Store contexts from submissions
         ...omit(clusters[node.cluster], "key"),
         color_backup: clusters[node.cluster].color,
         image: imageMap[tags[node.tag].image],
         items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
-      }),
-    );
+      });
+    });
     dataset.edges.forEach(([source, target, weight]) => {
       graph.addEdge(source, target, {
           size: Number(weight) * 0.1, // Scale edge thickness by weight (increased scaling for better visibility)
@@ -125,9 +140,21 @@ const Root: FC = () => {
       graph.setNodeAttribute(node,"size", radius)
     });
 
+    // Extract unique contexts from submissions
+    const uniqueContexts = new Set<string>();
+    dataset.submissions.forEach((submission) => {
+      if (submission.context) {
+        const contextTags = submission.context.split(',').map((c) => c.trim());
+        contextTags.forEach((ctx) => uniqueContexts.add(ctx));
+      }
+    });
+    const extractedContextsList = Array.from(uniqueContexts).map((ctx) => ({ key: ctx, label: ctx }));
+    setContextsList(extractedContextsList);
+
     setFiltersState({
       clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
       tags: mapValues(keyBy(dataset.tags, "key"), constant(true)),
+      contexts: mapValues(keyBy(extractedContextsList, "key"), constant(true)),
       selected_submissions: new Set(),
     });
     const safeDataset: Dataset = {
@@ -204,6 +231,24 @@ const Root: FC = () => {
                 <SearchField filters={filtersState} />
                 <DescriptionPanel />
                 <ItemsPanel selectedNode={selectedNode} />
+                <ContextsPanel
+                  contexts={contextsList}
+                  filters={filtersState}
+                  setContexts={(contexts) =>
+                    setFiltersState((filters) => ({
+                      ...filters,
+                      contexts,
+                    }))
+                  }
+                  toggleContext={(context) => {
+                    setFiltersState((filters) => ({
+                      ...filters,
+                      contexts: filters.contexts[context]
+                        ? omit(filters.contexts, context)
+                        : { ...filters.contexts, [context]: true },
+                    }));
+                  }}
+                />
                 <ClustersPanel
                   clusters={datasetState.clusters}
                   filters={filtersState}

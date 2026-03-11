@@ -49,6 +49,7 @@ export interface Dataset {
 export interface FiltersState {
   clusters: Record<string, boolean>;
   tags: Record<string, boolean>;
+  contexts: Record<string, boolean>;
   selected_submissions: Set<number>;
 }
 
