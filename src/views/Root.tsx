@@ -61,7 +61,6 @@ const Root: FC = () => {
   const graph = useMemo(() => new DirectedGraph(), []);
   const [showContents, setShowContents] = useState(false);
   const [dataReady, setDataReady] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(false);
   const [datasetState, setDataset] = useState<Dataset | null>(null);
   const [contextsList, setContextsList] = useState<Array<{ key: string; label: string }>>([]);
   const [filtersState, setFiltersState] = useState<FiltersState>({
@@ -217,15 +216,6 @@ const Root: FC = () => {
                   title="Show caption and description"
                 >
                   <BiBookContent />
-                </button>
-              </div>
-              <div className="react-sigma-control ico">
-                <button
-                  type="button"
-                  onClick={() => setDarkTheme(!darkTheme)}
-                  title={darkTheme ? "Switch to light theme" : "Switch to dark theme"}
-                >
-                  {darkTheme ? <BsSun /> : <BsMoon />}
                 </button>
               </div>
               <FullScreenControl className="ico">
