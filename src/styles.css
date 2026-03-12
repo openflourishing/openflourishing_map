@@ -391,3 +391,56 @@ ul > li {
 .submissions-dropdown-item:hover {
   background-color: #eee;
 }
+
+/**
+ * DARK MODE:
+ * **********
+ */
+#app-root.dark-mode,
+#app-root.dark-mode .sigma-container {
+  background: black;
+}
+#app-root.dark-mode div.ico > button {
+  background: #222;
+  color: #ddd;
+  box-shadow: 0 1px 5px #000;
+}
+#app-root.dark-mode div.ico > button:hover {
+  color: white;
+}
+#app-root.dark-mode .panel {
+  background: #1a1a1a;
+  color: #ddd;
+  box-shadow: 0 1px 5px #000;
+}
+#app-root.dark-mode .panel h2 button {
+  background: #1a1a1a;
+  border-color: #666;
+  color: #ddd;
+}
+#app-root.dark-mode .graph-title h1,
+#app-root.dark-mode .graph-title h2 {
+  background: rgba(0, 0, 0, 0.8);
+  color: #ddd;
+}
+#app-root.dark-mode .search-wrapper > input[type="search"] {
+  background: #1a1a1a;
+  color: #ddd;
+}
+#app-root.dark-mode .caption-row input[type="checkbox"]:not(:checked) + label {
+  color: #888;
+}
+#app-root.dark-mode .caption-row input[type="checkbox"]:not(:checked) + label .circle {
+  background-color: #1a1a1a !important;
+}
+#app-root.dark-mode .submissions-dropdown {
+  background: #1a1a1a;
+  border-color: #444;
+  color: #ddd;
+}
+#app-root.dark-mode .submissions-dropdown-item:hover {
+  background-color: #333;
+}
+#app-root.dark-mode #app-root.show-contents .graph-title {
+  background: #111;
+}

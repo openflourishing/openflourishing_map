@@ -5,7 +5,7 @@ import { DirectedGraph } from "graphology";
 import { constant, keyBy, mapValues, omit } from "lodash";
 import { FC, useEffect, useMemo, useState } from "react";
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
-import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut, BsEye, BsEyeSlash } from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut, BsEye, BsEyeSlash, BsMoon, BsSun } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import { Settings } from "sigma/settings";
 
@@ -72,6 +72,7 @@ const Root: FC = () => {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [showEdges, setShowEdges] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
       nodeProgramClasses: {
@@ -176,7 +177,7 @@ const Root: FC = () => {
   if (!datasetState) return null;
 
   return (
-    <div id="app-root" className={showContents ? "show-contents" : ""}>
+    <div id="app-root" className={[showContents ? "show-contents" : "", darkMode ? "dark-mode" : ""].filter(Boolean).join(" ")}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
         <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} />
         <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
@@ -185,6 +186,15 @@ const Root: FC = () => {
         {dataReady && (
           <>
             <div className="controls">
+              <div className="react-sigma-control ico">
+                <button
+                  type="button"
+                  onClick={() => setDarkMode((v) => !v)}
+                  title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                  {darkMode ? <BsSun /> : <BsMoon />}
+                </button>
+              </div>
               <div className="react-sigma-control ico">
                 <button
                   type="button"
