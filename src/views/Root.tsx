@@ -5,7 +5,7 @@ import { DirectedGraph } from "graphology";
 import { constant, keyBy, mapValues, omit } from "lodash";
 import { FC, useEffect, useMemo, useState } from "react";
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
-import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut, BsEye, BsEyeSlash } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import { Settings } from "sigma/settings";
 
@@ -71,6 +71,7 @@ const Root: FC = () => {
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [showEdges, setShowEdges] = useState(true);
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
       nodeProgramClasses: {
@@ -177,7 +178,7 @@ const Root: FC = () => {
   return (
     <div id="app-root" className={showContents ? "show-contents" : ""}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
-        <GraphSettingsController hoveredNode={hoveredNode} />
+        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} />
         <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
         <GraphDataController filters={filtersState} />
 
@@ -204,6 +205,15 @@ const Root: FC = () => {
                 <BsZoomOut />
                 <BiRadioCircleMarked />
               </ZoomControl>
+              <div className="react-sigma-control ico">
+                <button
+                  type="button"
+                  onClick={() => setShowEdges((v) => !v)}
+                  title={showEdges ? "Hide edges" : "Show edges"}
+                >
+                  {showEdges ? <BsEye /> : <BsEyeSlash />}
+                </button>
+              </div>
             </div>
             <div className="contents">
               <div className="ico">

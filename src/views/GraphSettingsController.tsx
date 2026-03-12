@@ -8,7 +8,7 @@ import useDebounce from "../use-debounce";
 const NODE_FADE_COLOR = "#eee";
 const EDGE_FADE_COLOR = "#eee";
 
-const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null }>> = ({ children, hoveredNode }) => {
+const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null; showEdges: boolean }>> = ({ children, hoveredNode, showEdges }) => {
   const sigma = useSigma();
   const setSettings = useSetSettings();
   const graph = sigma.getGraph();
@@ -43,10 +43,11 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
             ? { ...data, color: hoveredColor, size: data.size * 1.5 } // Scale up the original size instead of fixed 0.3
             : { ...data, color: EDGE_FADE_COLOR, hidden: true };
         }
+        if (!showEdges) return { ...data, hidden: true };
         return data;
       },
     });
-  }, [sigma, graph, debouncedHoveredNode]);
+  }, [sigma, graph, debouncedHoveredNode, showEdges]);
 
   /**
    * Update node and edge reducers when a node is hovered, to highlight its
@@ -73,9 +74,11 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
             graph.hasExtremity(edge, debouncedHoveredNode)
               ? { ...data, color: hoveredColor, size: data.size * 1.5 } // Scale up the original size instead of fixed 0.3
               : { ...data, color: EDGE_FADE_COLOR, hidden: true }
-        : null,
+        : showEdges
+          ? null
+          : (_edge, data) => ({ ...data, hidden: true }),
     );
-  }, [debouncedHoveredNode]);
+  }, [debouncedHoveredNode, showEdges]);
 
   return <>{children}</>;
 };
