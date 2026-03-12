@@ -139,8 +139,11 @@ const Root: FC = () => {
     const initialThreshold = 5.0;
     setEdgeSliderPos(Math.round(100 * Math.log(initialThreshold + 1) / Math.log(computedMax + 1)));
     dataset.edges.forEach(([source, target, weight]) => {
+      const w = Number(weight);
+      // Log-scale thickness: maps weight range to [0.5, 4] px for a more even visual distribution
+      const logSize = 0.5 + 3.5 * (Math.log(w + 1) / Math.log(computedMax + 1));
       graph.addEdge(source, target, {
-          size: Number(weight) * 0.1, // Scale edge thickness by weight (increased scaling for better visibility)
+          size: logSize,
           color: LightenDarkenColor(clusters[nodes_by_key[source].cluster].color, 70),
           weight: weight, // Add the weight as an edge attribute
         })
