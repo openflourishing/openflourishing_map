@@ -8,7 +8,7 @@ import useDebounce from "../use-debounce";
 const NODE_FADE_COLOR = "#eee";
 const EDGE_FADE_COLOR = "#eee";
 
-const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null; showEdges: boolean }>> = ({ children, hoveredNode, showEdges }) => {
+const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null; showEdges: boolean; edgeWeightThreshold: number }>> = ({ children, hoveredNode, showEdges, edgeWeightThreshold }) => {
   const sigma = useSigma();
   const setSettings = useSetSettings();
   const graph = sigma.getGraph();
@@ -38,6 +38,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
         return data;
       },
       edgeReducer: (edge: string, data: Attributes) => {
+        if ((data.weight as number) < edgeWeightThreshold) return { ...data, hidden: true };
         if (debouncedHoveredNode) {
           return graph.hasExtremity(edge, debouncedHoveredNode)
             ? { ...data, color: hoveredColor, size: data.size * 1.5 } // Scale up the original size instead of fixed 0.3
@@ -47,7 +48,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
         return data;
       },
     });
-  }, [sigma, graph, debouncedHoveredNode, showEdges]);
+  }, [sigma, graph, debouncedHoveredNode, showEdges, edgeWeightThreshold]);
 
   /**
    * Update node and edge reducers when a node is hovered, to highlight its
@@ -70,15 +71,21 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
     sigma.setSetting(
       "edgeReducer",
       debouncedHoveredNode
-        ? (edge, data) =>
-            graph.hasExtremity(edge, debouncedHoveredNode)
+        ? (edge, data) => {
+            if ((data.weight as number) < edgeWeightThreshold) return { ...data, hidden: true };
+            return graph.hasExtremity(edge, debouncedHoveredNode)
               ? { ...data, color: hoveredColor, size: data.size * 1.5 } // Scale up the original size instead of fixed 0.3
-              : { ...data, color: EDGE_FADE_COLOR, hidden: true }
-        : showEdges
-          ? null
-          : (_edge, data) => ({ ...data, hidden: true }),
+              : { ...data, color: EDGE_FADE_COLOR, hidden: true };
+          }
+        : edgeWeightThreshold > 0 || !showEdges
+          ? (_edge, data) => {
+              if ((data.weight as number) < edgeWeightThreshold) return { ...data, hidden: true };
+              if (!showEdges) return { ...data, hidden: true };
+              return data;
+            }
+          : null,
     );
-  }, [debouncedHoveredNode, showEdges]);
+  }, [debouncedHoveredNode, showEdges, edgeWeightThreshold]);
 
   return <>{children}</>;
 };

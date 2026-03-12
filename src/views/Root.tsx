@@ -73,6 +73,8 @@ const Root: FC = () => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [showEdges, setShowEdges] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [maxEdgeWeight, setMaxEdgeWeight] = useState(10);
+  const [edgeWeightThreshold, setEdgeWeightThreshold] = useState(0);
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
       nodeProgramClasses: {
@@ -128,6 +130,8 @@ const Root: FC = () => {
         items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
       });
     });
+    const computedMax = dataset.edges.reduce((max, [,, w]) => Math.max(max, Number(w)), 0);
+    setMaxEdgeWeight(computedMax);
     dataset.edges.forEach(([source, target, weight]) => {
       graph.addEdge(source, target, {
           size: Number(weight) * 0.1, // Scale edge thickness by weight (increased scaling for better visibility)
@@ -179,7 +183,7 @@ const Root: FC = () => {
   return (
     <div id="app-root" className={[showContents ? "show-contents" : "", darkMode ? "dark-mode" : ""].filter(Boolean).join(" ")}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
-        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} />
+        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} edgeWeightThreshold={edgeWeightThreshold} />
         <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
         <GraphDataController filters={filtersState} />
 
@@ -223,6 +227,20 @@ const Root: FC = () => {
                 >
                   {showEdges ? <BsEye /> : <BsEyeSlash />}
                 </button>
+              </div>
+              <div className="edge-weight-control">
+                <label htmlFor="edge-weight-slider" title="Minimum edge weight — only edges at or above this value are shown">
+                  min weight: {edgeWeightThreshold.toFixed(1)}
+                </label>
+                <input
+                  id="edge-weight-slider"
+                  type="range"
+                  min={0}
+                  max={maxEdgeWeight}
+                  step={0.1}
+                  value={edgeWeightThreshold}
+                  onChange={(e) => setEdgeWeightThreshold(Number(e.target.value))}
+                />
               </div>
             </div>
             <div className="contents">
