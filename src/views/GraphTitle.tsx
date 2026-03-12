@@ -8,7 +8,7 @@ function prettyPercentage(val: number): string {
   return (val * 100).toFixed(1) + "%";
 }
 
-const GraphTitle: FC<{ filters: FiltersState }> = ({ filters }) => {
+const GraphTitle: FC<{ filters: FiltersState; edgeWeightThreshold: number; showEdges: boolean }> = ({ filters, edgeWeightThreshold, showEdges }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
 
@@ -20,10 +20,15 @@ const GraphTitle: FC<{ filters: FiltersState }> = ({ filters }) => {
     requestAnimationFrame(() => {
       const index = { nodes: 0, edges: 0 };
       graph.forEachNode((_, { hidden }) => !hidden && index.nodes++);
-      graph.forEachEdge((_, _2, _3, _4, source, target) => !source.hidden && !target.hidden && index.edges++);
+      graph.forEachEdge((_, edgeAttrs, _3, _4, source, target) => {
+        if (source.hidden || target.hidden) return;
+        if (!showEdges) return;
+        if ((edgeAttrs.weight as number) < edgeWeightThreshold) return;
+        index.edges++;
+      });
       setVisibleItems(index);
     });
-  }, [filters]);
+  }, [filters, edgeWeightThreshold, showEdges]);
 
   return (
     <div className="graph-title">

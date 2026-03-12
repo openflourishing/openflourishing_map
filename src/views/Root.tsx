@@ -74,7 +74,10 @@ const Root: FC = () => {
   const [showEdges, setShowEdges] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [maxEdgeWeight, setMaxEdgeWeight] = useState(10);
-  const [edgeWeightThreshold, setEdgeWeightThreshold] = useState(0);
+  const [edgeSliderPos, setEdgeSliderPos] = useState(0);
+  // Exponential mapping: slider 0-100 → threshold 0-maxEdgeWeight
+  // More steps at the low end of the weight range
+  const edgeWeightThreshold = Math.pow(maxEdgeWeight + 1, edgeSliderPos / 100) - 1;
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
       nodeProgramClasses: {
@@ -88,7 +91,7 @@ const Root: FC = () => {
       defaultEdgeType: "line",
       labelDensity: 0.07,
       labelGridCellSize: 60,
-      labelRenderedSizeThreshold: 5,
+      labelRenderedSizeThreshold: 0.4,
       labelFont: "Work Sans, sans-serif",
       zIndex: true,
       zoomToSizeRatioFunction: (ratio: number) => ratio,
@@ -132,6 +135,9 @@ const Root: FC = () => {
     });
     const computedMax = dataset.edges.reduce((max, [,, w]) => Math.max(max, Number(w)), 0);
     setMaxEdgeWeight(computedMax);
+    // Set initial slider position so threshold starts at 5.0
+    const initialThreshold = 5.0;
+    setEdgeSliderPos(Math.round(100 * Math.log(initialThreshold + 1) / Math.log(computedMax + 1)));
     dataset.edges.forEach(([source, target, weight]) => {
       graph.addEdge(source, target, {
           size: Number(weight) * 0.1, // Scale edge thickness by weight (increased scaling for better visibility)
@@ -230,16 +236,16 @@ const Root: FC = () => {
               </div>
               <div className="edge-weight-control">
                 <label htmlFor="edge-weight-slider" title="Minimum edge weight — only edges at or above this value are shown">
-                  min weight: {edgeWeightThreshold.toFixed(1)}
+                  min weight: {edgeWeightThreshold.toFixed(2)}
                 </label>
                 <input
                   id="edge-weight-slider"
                   type="range"
                   min={0}
-                  max={maxEdgeWeight}
-                  step={0.1}
-                  value={edgeWeightThreshold}
-                  onChange={(e) => setEdgeWeightThreshold(Number(e.target.value))}
+                  max={100}
+                  step={1}
+                  value={edgeSliderPos}
+                  onChange={(e) => setEdgeSliderPos(Number(e.target.value))}
                 />
               </div>
             </div>
@@ -254,7 +260,7 @@ const Root: FC = () => {
                   <GrClose />
                 </button>
               </div>
-              <GraphTitle filters={filtersState} />
+              <GraphTitle filters={filtersState} edgeWeightThreshold={edgeWeightThreshold} showEdges={showEdges} />
               <div className="panels">
                 <SubmissionsPanel
                   network_submissions={datasetState.submissions}
