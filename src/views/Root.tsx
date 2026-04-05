@@ -11,12 +11,13 @@ import { Settings } from "sigma/settings";
 
 import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState, Item } from "../types";
-import { RotationAngles, rotate3D, calculateDepthScale } from "../rotation-utils";
+import { RotationAngles } from "../rotation-utils";
 import ClustersPanel from "./ClustersPanel";
 import ContextsPanel from "./ContextsPanel";
 import DescriptionPanel from "./DescriptionPanel";
 import GraphDataController from "./GraphDataController";
 import GraphEventsController from "./GraphEventsController";
+import GraphRotationController from "./GraphRotationController";
 import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
 import imageMap from './imageMap';
@@ -81,9 +82,6 @@ const Root: FC = () => {
   
   // Store original 3D positions for each node
   const originalPositions = useRef<Map<string, { x: number; y: number; z: number; size: number }>>(new Map());
-  
-  // Throttle state for rotation updates
-  const rotationThrottleTimer = useRef<number | null>(null);
   
   // Exponential mapping: slider 0-100 → threshold 0-maxEdgeWeight
   // More steps at the low end of the weight range
@@ -210,61 +208,6 @@ const Root: FC = () => {
     requestAnimationFrame(() => setDataReady(true));
   }, [datasetState]);
 
-  // Apply 3D rotation with throttling
-  useEffect(() => {
-    if (!dataReady) return;
-    
-    // Throttle rotation updates to 50ms
-    if (rotationThrottleTimer.current !== null) {
-      window.clearTimeout(rotationThrottleTimer.current);
-    }
-    
-    rotationThrottleTimer.current = window.setTimeout(() => {
-      let minZ = Infinity;
-      let maxZ = -Infinity;
-      
-      // First pass: apply rotation and find min/max Z
-      const rotatedPositions = new Map<string, { x: number; y: number; z: number }>();
-      
-      graph.forEachNode((node) => {
-        const original = originalPositions.current.get(node);
-        if (!original) return;
-        
-        const rotated = rotate3D(
-          { x: original.x, y: original.y, z: original.z },
-          rotationAngles
-        );
-        
-        rotatedPositions.set(node, rotated);
-        minZ = Math.min(minZ, rotated.z);
-        maxZ = Math.max(maxZ, rotated.z);
-      });
-      
-      // Second pass: update positions and sizes
-      graph.forEachNode((node) => {
-        const rotated = rotatedPositions.get(node);
-        const original = originalPositions.current.get(node);
-        if (!rotated || !original) return;
-        
-        // Update x, y positions (projection)
-        graph.setNodeAttribute(node, 'x', rotated.x);
-        graph.setNodeAttribute(node, 'y', rotated.y);
-        
-        // Calculate and apply depth-based size scaling
-        const depthScale = calculateDepthScale(rotated.z, minZ, maxZ, 0.5, 1.5);
-        graph.setNodeAttribute(node, 'size', original.size * depthScale);
-      });
-      
-      rotationThrottleTimer.current = null;
-    }, 50);
-    
-    return () => {
-      if (rotationThrottleTimer.current !== null) {
-        window.clearTimeout(rotationThrottleTimer.current);
-      }
-    };
-  }, [rotationAngles, dataReady, graph]);
-
   if (!datasetState) return null;
 
   return (
@@ -273,6 +216,11 @@ const Root: FC = () => {
         <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} edgeWeightThreshold={edgeWeightThreshold} />
         <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
         <GraphDataController filters={filtersState} />
+        <GraphRotationController 
+          rotationAngles={rotationAngles} 
+          originalPositions={originalPositions.current}
+          dataReady={dataReady}
+        />
 
         {dataReady && (
           <>
