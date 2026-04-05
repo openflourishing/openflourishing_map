@@ -8,6 +8,13 @@ interface GraphRotationControllerProps {
   dataReady: boolean;
 }
 
+const LERP_FACTOR = 0.15;
+const SNAP_THRESHOLD = 0.1; // degrees
+
+function lerpAngle(current: number, target: number, factor: number): number {
+  return current + (target - current) * factor;
+}
+
 const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps>> = ({ 
   rotationAngles, 
   originalPositions,
@@ -16,7 +23,9 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
 }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
-  const rotationThrottleTimer = useRef<number | null>(null);
+  const displayedAngles = useRef<RotationAngles>({ rotX: 0, rotY: 0, rotZ: 0 });
+  const targetAngles = useRef<RotationAngles>({ rotX: 0, rotY: 0, rotZ: 0 });
+  const animFrameId = useRef<number | null>(null);
   const bboxLocked = useRef(false);
 
   // On first render after data is ready, lock the bounding box so sigma never
@@ -60,15 +69,41 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
     bboxLocked.current = true;
   }, [dataReady, sigma, originalPositions]);
 
-  // Apply 3D rotation with throttling
+  // Apply rotation with smooth animation loop
   useEffect(() => {
     if (!dataReady) return;
-    
-    if (rotationThrottleTimer.current !== null) {
-      window.clearTimeout(rotationThrottleTimer.current);
-    }
-    
-    rotationThrottleTimer.current = window.setTimeout(() => {
+
+    // Update the target angles
+    targetAngles.current = { ...rotationAngles };
+
+    // If an animation loop is already running, it will pick up the new target
+    if (animFrameId.current !== null) return;
+
+    const animate = () => {
+      const displayed = displayedAngles.current;
+      const target = targetAngles.current;
+
+      // Lerp each axis toward the target
+      const newAngles: RotationAngles = {
+        rotX: lerpAngle(displayed.rotX, target.rotX, LERP_FACTOR),
+        rotY: lerpAngle(displayed.rotY, target.rotY, LERP_FACTOR),
+        rotZ: lerpAngle(displayed.rotZ, target.rotZ, LERP_FACTOR),
+      };
+
+      // Check if we're close enough to snap
+      const dX = Math.abs(newAngles.rotX - target.rotX);
+      const dY = Math.abs(newAngles.rotY - target.rotY);
+      const dZ = Math.abs(newAngles.rotZ - target.rotZ);
+      const atTarget = dX < SNAP_THRESHOLD && dY < SNAP_THRESHOLD && dZ < SNAP_THRESHOLD;
+
+      if (atTarget) {
+        newAngles.rotX = target.rotX;
+        newAngles.rotY = target.rotY;
+        newAngles.rotZ = target.rotZ;
+      }
+
+      displayedAngles.current = newAngles;
+
       // Calculate centroid of original positions to rotate around
       let centroidX = 0, centroidY = 0, centroidZ = 0, count = 0;
       originalPositions.forEach((pos) => {
@@ -97,7 +132,7 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
           z: original.z - centroidZ,
         };
         
-        const rotated = rotate3D(translated, rotationAngles);
+        const rotated = rotate3D(translated, newAngles);
         
         const finalPosition = {
           x: rotated.x + centroidX,
@@ -125,13 +160,20 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
           size: original.size * depthScale,
         };
       });
-      
-      rotationThrottleTimer.current = null;
-    }, 50);
+
+      if (atTarget) {
+        animFrameId.current = null;
+      } else {
+        animFrameId.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animFrameId.current = requestAnimationFrame(animate);
     
     return () => {
-      if (rotationThrottleTimer.current !== null) {
-        window.clearTimeout(rotationThrottleTimer.current);
+      if (animFrameId.current !== null) {
+        cancelAnimationFrame(animFrameId.current);
+        animFrameId.current = null;
       }
     };
   }, [rotationAngles, dataReady, graph, sigma, originalPositions]);
