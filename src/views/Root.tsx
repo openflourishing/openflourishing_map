@@ -3,7 +3,7 @@ import { createNodeImageProgram } from "@sigma/node-image";
 // import EdgeCurveProgram from "@sigma/edge-curve";
 import { DirectedGraph } from "graphology";
 import { constant, keyBy, mapValues, omit } from "lodash";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut, BsEye, BsEyeSlash, BsMoon, BsSun } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
@@ -11,6 +11,7 @@ import { Settings } from "sigma/settings";
 
 import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState, Item } from "../types";
+import { RotationAngles, rotate3D, calculateDepthScale } from "../rotation-utils";
 import ClustersPanel from "./ClustersPanel";
 import ContextsPanel from "./ContextsPanel";
 import DescriptionPanel from "./DescriptionPanel";
@@ -20,6 +21,7 @@ import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
 import imageMap from './imageMap';
 import ItemsPanel from "./ItemsPanel";
+import Rotation3DPanel from "./Rotation3DPanel";
 import SearchField from "./SearchField";
 import SubmissionsPanel from "./SubmissionsPanel";
 // import TagsPanel from "./TagsPanel";
@@ -75,6 +77,14 @@ const Root: FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [maxEdgeWeight, setMaxEdgeWeight] = useState(10);
   const [edgeSliderPos, setEdgeSliderPos] = useState(0);
+  const [rotationAngles, setRotationAngles] = useState<RotationAngles>({ rotX: 0, rotY: 0, rotZ: 0 });
+  
+  // Store original 3D positions for each node
+  const originalPositions = useRef<Map<string, { x: number; y: number; z: number; size: number }>>(new Map());
+  
+  // Throttle state for rotation updates
+  const rotationThrottleTimer = useRef<number | null>(null);
+  
   // Exponential mapping: slider 0-100 → threshold 0-maxEdgeWeight
   // More steps at the low end of the weight range
   const edgeWeightThreshold = Math.pow(maxEdgeWeight + 1, edgeSliderPos / 100) - 1;
@@ -125,6 +135,7 @@ const Root: FC = () => {
       
       graph.addNode(node.key, {
         ...node,
+        z: (node as any).z || 0, // Ensure z coordinate is included
         submissions: new Set(node.submissions), // Convert to Set<string>
         contexts: Array.from(nodeContexts), // Store contexts from submissions
         ...omit(clusters[node.cluster], "key"),
@@ -155,6 +166,17 @@ const Root: FC = () => {
       graph.setNodeAttribute(node,"size", radius)
     });
 
+    // Store original 3D positions for rotation calculations
+    graph.forEachNode((node) => {
+      const nodeData = graph.getNodeAttributes(node);
+      originalPositions.current.set(node, {
+        x: nodeData.x,
+        y: nodeData.y,
+        z: nodeData.z || 0, // Default to 0 if z is not present
+        size: nodeData.size,
+      });
+    });
+
     // Extract unique contexts from submissions
     const uniqueContexts = new Set<string>();
     dataset.submissions.forEach((submission) => {
@@ -176,6 +198,7 @@ const Root: FC = () => {
       ...dataset,
       nodes: dataset.nodes.map((node) => ({
           ...node,
+          z: (node as any).z || 0, // Include z coordinate, default to 0 if not present
           submissions: new Set(node.submissions),
           items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
       })),
@@ -186,6 +209,61 @@ const Root: FC = () => {
     setDataset(safeDataset);
     requestAnimationFrame(() => setDataReady(true));
   }, [datasetState]);
+
+  // Apply 3D rotation with throttling
+  useEffect(() => {
+    if (!dataReady) return;
+    
+    // Throttle rotation updates to 50ms
+    if (rotationThrottleTimer.current !== null) {
+      window.clearTimeout(rotationThrottleTimer.current);
+    }
+    
+    rotationThrottleTimer.current = window.setTimeout(() => {
+      let minZ = Infinity;
+      let maxZ = -Infinity;
+      
+      // First pass: apply rotation and find min/max Z
+      const rotatedPositions = new Map<string, { x: number; y: number; z: number }>();
+      
+      graph.forEachNode((node) => {
+        const original = originalPositions.current.get(node);
+        if (!original) return;
+        
+        const rotated = rotate3D(
+          { x: original.x, y: original.y, z: original.z },
+          rotationAngles
+        );
+        
+        rotatedPositions.set(node, rotated);
+        minZ = Math.min(minZ, rotated.z);
+        maxZ = Math.max(maxZ, rotated.z);
+      });
+      
+      // Second pass: update positions and sizes
+      graph.forEachNode((node) => {
+        const rotated = rotatedPositions.get(node);
+        const original = originalPositions.current.get(node);
+        if (!rotated || !original) return;
+        
+        // Update x, y positions (projection)
+        graph.setNodeAttribute(node, 'x', rotated.x);
+        graph.setNodeAttribute(node, 'y', rotated.y);
+        
+        // Calculate and apply depth-based size scaling
+        const depthScale = calculateDepthScale(rotated.z, minZ, maxZ, 0.5, 1.5);
+        graph.setNodeAttribute(node, 'size', original.size * depthScale);
+      });
+      
+      rotationThrottleTimer.current = null;
+    }, 50);
+    
+    return () => {
+      if (rotationThrottleTimer.current !== null) {
+        window.clearTimeout(rotationThrottleTimer.current);
+      }
+    };
+  }, [rotationAngles, dataReady, graph]);
 
   if (!datasetState) return null;
 
@@ -251,6 +329,10 @@ const Root: FC = () => {
                   onChange={(e) => setEdgeSliderPos(Number(e.target.value))}
                 />
               </div>
+              <Rotation3DPanel 
+                rotationAngles={rotationAngles}
+                onRotationChange={setRotationAngles}
+              />
             </div>
             <div className="contents">
               <div className="ico">

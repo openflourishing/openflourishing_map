@@ -7,6 +7,7 @@ export interface NodeData {
   submissions: Set<number>;
   x: number;
   y: number;
+  z: number;
   items: Item[];
 }
 

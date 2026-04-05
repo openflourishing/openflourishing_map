@@ -422,6 +422,56 @@ ul > li {
 }
 
 /**
+ * 3D ROTATION PANEL:
+ * ******************
+ */
+.rotation-3d-panel {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 0.6em;
+  margin-top: 0.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4em;
+}
+.rotation-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+}
+.rotation-control label {
+  font-size: 0.7em;
+  color: black;
+  white-space: nowrap;
+  cursor: default;
+  font-family: "Work Sans", sans-serif;
+  font-weight: 500;
+}
+.rotation-control input[type="range"] {
+  width: 100px;
+  accent-color: black;
+  cursor: pointer;
+  margin: 0;
+}
+.reset-rotation-btn {
+  margin-top: 0.2em;
+  padding: 0.3em 0.6em;
+  font-size: 0.7em;
+  font-family: "Work Sans", sans-serif;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.reset-rotation-btn:hover {
+  background: #e0e0e0;
+}
+
+/**
  * DARK MODE:
  * **********
  */
@@ -479,6 +529,24 @@ ul > li {
 }
 #app-root.dark-mode .edge-weight-control input[type="range"] {
   accent-color: #ddd;
+}
+#app-root.dark-mode .rotation-3d-panel {
+  background: #222;
+  box-shadow: 0 1px 5px #000;
+}
+#app-root.dark-mode .rotation-control label {
+  color: #ddd;
+}
+#app-root.dark-mode .rotation-control input[type="range"] {
+  accent-color: #ddd;
+}
+#app-root.dark-mode .reset-rotation-btn {
+  background: #333;
+  border-color: #555;
+  color: #ddd;
+}
+#app-root.dark-mode .reset-rotation-btn:hover {
+  background: #444;
 }
 #app-root.dark-mode #app-root.show-contents .graph-title {
   background: #111;
