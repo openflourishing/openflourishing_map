@@ -110,3 +110,83 @@ export function calculateDepthScale(
   // Map to scale range - higher z = larger scale (closer to viewer)
   return minScale + normalized * (maxScale - minScale);
 }
+
+// --- Quaternion utilities for gimbal-lock-free rotation composition ---
+
+export type Quaternion = [number, number, number, number]; // [w, x, y, z]
+
+function quatFromAxisAngle(ax: number, ay: number, az: number, angleDeg: number): Quaternion {
+  const half = degToRad(angleDeg) / 2;
+  const s = Math.sin(half);
+  return [Math.cos(half), ax * s, ay * s, az * s];
+}
+
+function quatMultiply(a: Quaternion, b: Quaternion): Quaternion {
+  return [
+    a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
+    a[0]*b[1] + a[1]*b[0] + a[2]*b[3] - a[3]*b[2],
+    a[0]*b[2] - a[1]*b[3] + a[2]*b[0] + a[3]*b[1],
+    a[0]*b[3] + a[1]*b[2] - a[2]*b[1] + a[3]*b[0],
+  ];
+}
+
+function quatNormalize(q: Quaternion): Quaternion {
+  const len = Math.sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
+  if (len === 0) return [1, 0, 0, 0];
+  return [q[0]/len, q[1]/len, q[2]/len, q[3]/len];
+}
+
+/** Convert Euler angles (degrees) to quaternion using Z→Y→X order */
+export function eulerToQuat(angles: RotationAngles): Quaternion {
+  const qx = quatFromAxisAngle(1, 0, 0, angles.rotX);
+  const qy = quatFromAxisAngle(0, 1, 0, angles.rotY);
+  const qz = quatFromAxisAngle(0, 0, 1, angles.rotZ);
+  // Z→Y→X order: qx * qy * qz
+  return quatNormalize(quatMultiply(quatMultiply(qx, qy), qz));
+}
+
+function radToDeg(r: number): number {
+  return (r * 180) / Math.PI;
+}
+
+/** Convert quaternion back to Euler angles (degrees) in Z→Y→X order */
+export function quatToEuler(q: Quaternion): RotationAngles {
+  const [w, x, y, z] = q;
+
+  // rotY (Y-axis) — asin clamp to avoid NaN near ±1
+  const sinY = -2 * (x * z - w * y);
+  const clampedSinY = Math.max(-1, Math.min(1, sinY));
+  const rotY = radToDeg(Math.asin(clampedSinY));
+
+  let rotX: number;
+  let rotZ: number;
+
+  if (Math.abs(clampedSinY) > 0.9999) {
+    // Gimbal lock — assign all remaining rotation to rotX, set rotZ = 0
+    rotX = radToDeg(Math.atan2(-2 * (y * z - w * x), 1 - 2 * (x * x + z * z)));
+    rotZ = 0;
+  } else {
+    rotX = radToDeg(Math.atan2(2 * (y * z + w * x), 1 - 2 * (x * x + y * y)));
+    rotZ = radToDeg(Math.atan2(2 * (x * y + w * z), 1 - 2 * (y * y + z * z)));
+  }
+
+  return { rotX, rotY, rotZ };
+}
+
+/**
+ * Apply an incremental screen-space rotation (dx→Y axis, dy→X axis) to
+ * existing Euler angles without gimbal lock, by composing via quaternions.
+ */
+export function composeOrbitRotation(
+  current: RotationAngles,
+  dxDeg: number,
+  dyDeg: number,
+): RotationAngles {
+  const qCurrent = eulerToQuat(current);
+  // Incremental rotation: first around world-Y (horizontal drag), then world-X (vertical drag)
+  const qDeltaY = quatFromAxisAngle(0, 1, 0, dxDeg);
+  const qDeltaX = quatFromAxisAngle(1, 0, 0, dyDeg);
+  // Apply incremental rotations: delta * current (pre-multiply for world-space axes)
+  const qNew = quatNormalize(quatMultiply(quatMultiply(qDeltaX, qDeltaY), qCurrent));
+  return quatToEuler(qNew);
+}

@@ -8,6 +8,11 @@ export interface NodeData {
   x: number;
   y: number;
   z: number;
+  pos_2d_x: number;
+  pos_2d_y: number;
+  pos_nd_0: number;
+  pos_nd_1: number;
+  pos_nd_2: number;
   items: Item[];
 }
 

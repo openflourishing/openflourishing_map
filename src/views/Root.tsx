@@ -79,9 +79,13 @@ const Root: FC = () => {
   const [maxEdgeWeight, setMaxEdgeWeight] = useState(10);
   const [edgeSliderPos, setEdgeSliderPos] = useState(0);
   const [rotationAngles, setRotationAngles] = useState<RotationAngles>({ rotX: 0, rotY: 0, rotZ: 0 });
+  const [is3DMode, setIs3DMode] = useState(false);
   
-  // Store original 3D positions for each node
+  // Store original 3D positions for each node (current base positions used by rotation)
   const originalPositions = useRef<Map<string, { x: number; y: number; z: number; size: number }>>(new Map());
+  // Store the 2D and 3D coordinate sets for toggling
+  const positions2D = useRef<Map<string, { x: number; y: number; z: number }>>(new Map());
+  const positions3D = useRef<Map<string, { x: number; y: number; z: number }>>(new Map());
   
   // Exponential mapping: slider 0-100 → threshold 0-maxEdgeWeight
   // More steps at the low end of the weight range
@@ -133,13 +137,26 @@ const Root: FC = () => {
       
       graph.addNode(node.key, {
         ...node,
-        z: (node as any).z || 0, // Ensure z coordinate is included
+        x: (node as any).pos_2d_x || 0,
+        y: (node as any).pos_2d_y || 0,
+        z: 0,
         submissions: new Set(node.submissions), // Convert to Set<string>
         contexts: Array.from(nodeContexts), // Store contexts from submissions
         ...omit(clusters[node.cluster], "key"),
         color_backup: clusters[node.cluster].color,
         image: imageMap[tags[node.tag].image],
         items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
+      });
+      // Store both 2D and 3D coordinate sets
+      positions2D.current.set(node.key, {
+        x: (node as any).pos_2d_x || 0,
+        y: (node as any).pos_2d_y || 0,
+        z: 0,
+      });
+      positions3D.current.set(node.key, {
+        x: (node as any).pos_nd_0 || 0,
+        y: (node as any).pos_nd_1 || 0,
+        z: (node as any).pos_nd_2 || 0,
       });
     });
     const computedMax = dataset.edges.reduce((max, [,, w]) => Math.max(max, Number(w)), 0);
@@ -164,13 +181,13 @@ const Root: FC = () => {
       graph.setNodeAttribute(node,"size", radius)
     });
 
-    // Store original 3D positions for rotation calculations
+    // Store original positions for rotation calculations (start in 2D mode)
     graph.forEachNode((node) => {
       const nodeData = graph.getNodeAttributes(node);
       originalPositions.current.set(node, {
         x: nodeData.x,
         y: nodeData.y,
-        z: nodeData.z || 0, // Default to 0 if z is not present
+        z: 0,
         size: nodeData.size,
       });
     });
@@ -196,7 +213,14 @@ const Root: FC = () => {
       ...dataset,
       nodes: dataset.nodes.map((node) => ({
           ...node,
-          z: (node as any).z || 0, // Include z coordinate, default to 0 if not present
+          x: (node as any).pos_2d_x || 0,
+          y: (node as any).pos_2d_y || 0,
+          z: 0,
+          pos_2d_x: (node as any).pos_2d_x || 0,
+          pos_2d_y: (node as any).pos_2d_y || 0,
+          pos_nd_0: (node as any).pos_nd_0 || 0,
+          pos_nd_1: (node as any).pos_nd_1 || 0,
+          pos_nd_2: (node as any).pos_nd_2 || 0,
           submissions: new Set(node.submissions),
           items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
       })),
@@ -218,7 +242,11 @@ const Root: FC = () => {
         <GraphDataController filters={filtersState} />
         <GraphRotationController 
           rotationAngles={rotationAngles} 
+          onRotationChange={setRotationAngles}
           originalPositions={originalPositions.current}
+          positions2D={positions2D.current}
+          positions3D={positions3D.current}
+          is3DMode={is3DMode}
           dataReady={dataReady}
         />
 
@@ -280,6 +308,13 @@ const Root: FC = () => {
               <Rotation3DPanel 
                 rotationAngles={rotationAngles}
                 onRotationChange={setRotationAngles}
+                is3DMode={is3DMode}
+                onToggle3DMode={(enabled) => {
+                  if (!enabled) {
+                    setRotationAngles({ rotX: 0, rotY: 0, rotZ: 0 });
+                  }
+                  setIs3DMode(enabled);
+                }}
               />
             </div>
             <div className="contents">
