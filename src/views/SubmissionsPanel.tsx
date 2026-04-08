@@ -18,7 +18,8 @@ const SubmissionsPanel: FC<{
   network_submissions: Submission[];
   filters: FiltersState;
   setSubmissions: (selected_submissions: Set<number>) => void;
-}> = ({ network_submissions, setSubmissions }) => {
+  darkMode: boolean;
+}> = ({ network_submissions, setSubmissions, darkMode }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
 
@@ -64,7 +65,9 @@ const SubmissionsPanel: FC<{
     });
     updated.forEach((subKey) => {
       submissionToNodeIds[subKey].forEach((node_id) => {
-        const color = graph.getNodeAttribute(node_id, "color_backup");
+        const color = darkMode
+          ? graph.getNodeAttribute(node_id, "color_dark_backup")
+          : graph.getNodeAttribute(node_id, "color_backup");
         graph.setNodeAttribute(node_id, "color", color);
       });
     });
@@ -84,13 +87,17 @@ const SubmissionsPanel: FC<{
       });
       updated.forEach((subKey) => {
         submissionToNodeIds[subKey].forEach((node_id) => {
-          const color = graph.getNodeAttribute(node_id, "color_backup");
+          const color = darkMode
+            ? graph.getNodeAttribute(node_id, "color_dark_backup")
+            : graph.getNodeAttribute(node_id, "color_backup");
           graph.setNodeAttribute(node_id, "color", color);
         });
       });
     } else {
       graph.forEachNode((node_id) => {
-        const color = graph.getNodeAttribute(node_id, "color_backup");
+        const color = darkMode
+          ? graph.getNodeAttribute(node_id, "color_dark_backup")
+          : graph.getNodeAttribute(node_id, "color_backup");
         graph.setNodeAttribute(node_id, "color", color);
       });
       graph.forEachEdge((edge) => {

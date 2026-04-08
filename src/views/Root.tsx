@@ -135,6 +135,7 @@ const Root: FC = () => {
         }
       });
       
+      const cluster = clusters[node.cluster];
       graph.addNode(node.key, {
         ...node,
         x: (node as any).pos_2d_x || 0,
@@ -142,8 +143,10 @@ const Root: FC = () => {
         z: 0,
         submissions: new Set(node.submissions), // Convert to Set<string>
         contexts: Array.from(nodeContexts), // Store contexts from submissions
-        ...omit(clusters[node.cluster], "key"),
-        color_backup: clusters[node.cluster].color,
+        ...omit(cluster, "key"),
+        color: cluster.color,
+        color_backup: cluster.color,
+        color_dark_backup: cluster.color_dark,
         image: imageMap[tags[node.tag].image],
         items: typedItemPool[node.label.replace(/\*$/, '')] || [], // Strip trailing "*" to match item_pool keys
       });
@@ -168,9 +171,12 @@ const Root: FC = () => {
       const w = Number(weight);
       // Log-scale thickness: maps weight range to [0.5, 4] px for a more even visual distribution
       const logSize = 0.5 + 3.5 * (Math.log(w + 1) / Math.log(computedMax + 1));
+      const sourceCluster = clusters[nodes_by_key[source].cluster];
       graph.addEdge(source, target, {
           size: logSize,
-          color: LightenDarkenColor(clusters[nodes_by_key[source].cluster].color, 70),
+          color: LightenDarkenColor(sourceCluster.color, 70),
+          color_backup: LightenDarkenColor(sourceCluster.color, 70),
+          color_dark_backup: LightenDarkenColor(sourceCluster.color_dark, 70),
           weight: weight, // Add the weight as an edge attribute
         })
     });
@@ -231,6 +237,25 @@ const Root: FC = () => {
     setDataset(safeDataset);
     requestAnimationFrame(() => setDataReady(true));
   }, [datasetState]);
+
+  // Update node and edge colors when dark mode changes
+  useEffect(() => {
+    if (!dataReady) return;
+    
+    graph.forEachNode((node) => {
+      const colorBackup = darkMode 
+        ? graph.getNodeAttribute(node, "color_dark_backup")
+        : graph.getNodeAttribute(node, "color_backup");
+      graph.setNodeAttribute(node, "color", colorBackup);
+    });
+
+    graph.forEachEdge((edge) => {
+      const colorBackup = darkMode
+        ? graph.getEdgeAttribute(edge, "color_dark_backup") 
+        : graph.getEdgeAttribute(edge, "color_backup");
+      graph.setEdgeAttribute(edge, "color", colorBackup);
+    });
+  }, [darkMode, dataReady, graph]);
 
   if (!datasetState) return null;
 
@@ -333,6 +358,7 @@ const Root: FC = () => {
                 <SubmissionsPanel
                   network_submissions={datasetState.submissions}
                   filters={filtersState}
+                  darkMode={darkMode}
                   setSubmissions={(selected_submissions) =>
                     setFiltersState((filters) => ({
                       ...filters,

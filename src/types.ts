@@ -19,6 +19,7 @@ export interface NodeData {
 export interface Cluster {
   key: string;
   color: string;
+  color_dark: string;
   clusterLabel: string;
 }
 

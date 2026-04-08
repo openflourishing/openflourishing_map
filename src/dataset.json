@@ -184133,147 +184133,176 @@
   "clusters": [
     {
       "key": "0",
-      "color": "#74E45E",
+      "color": "#15803D",
+      "color_dark": "#22C55E",
       "clusterLabel": "Physical health, Vitality, Health and Energy"
     },
     {
       "key": "1",
-      "color": "#5B57D8",
+      "color": "#3730A3",
+      "color_dark": "#6366F1",
       "clusterLabel": "Relationships, Family, Community and Help"
     },
     {
       "key": "2",
-      "color": "#F06059",
+      "color": "#B91C1C",
+      "color_dark": "#EF4444",
       "clusterLabel": "Happiness, Anxiety, Depression and Enjoyment"
     },
     {
       "key": "3",
-      "color": "#5CD2FC",
+      "color": "#0E7490",
+      "color_dark": "#22D3EE",
       "clusterLabel": "Goals, Self-efficacy, Competence and Achievement"
     },
     {
       "key": "4",
-      "color": "#403D97",
+      "color": "#1E40AF",
+      "color_dark": "#3B82F6",
       "clusterLabel": "Responsibility, Communication, Servant leadership and Performance"
     },
     {
       "key": "5",
-      "color": "#E98AFD",
+      "color": "#9333EA",
+      "color_dark": "#C084FC",
       "clusterLabel": "Coping, Problem-solving, Planning and Avoidance"
     },
     {
       "key": "6",
-      "color": "#B2B055",
+      "color": "#84CC16",
+      "color_dark": "#BEF264",
       "clusterLabel": "Autonomy, Control, Decision-making and Self-awareness"
     },
     {
       "key": "7",
-      "color": "#519F41",
+      "color": "#166534",
+      "color_dark": "#4ADE80",
       "clusterLabel": "Learning, Personal growth, Self-regulation and Feelings"
     },
     {
       "key": "8",
-      "color": "#FCD26D",
+      "color": "#CA8A04",
+      "color_dark": "#FCD34D",
       "clusterLabel": "Spirituality, Spiritual wellbeing, Values and Faith"
     },
     {
       "key": "9",
-      "color": "#717864",
+      "color": "#65A30D",
+      "color_dark": "#A3E635",
       "clusterLabel": "Meaning, Purpose, Worthwhileness and Vision"
     },
     {
       "key": "10",
-      "color": "#A8433E",
+      "color": "#DC2626",
+      "color_dark": "#F87171",
       "clusterLabel": "Fun, Leisure, Education and Motivation"
     },
     {
       "key": "11",
-      "color": "#AAF4EB",
+      "color": "#06B6D4",
+      "color_dark": "#38BDF8",
       "clusterLabel": "Security, Safety, Social comparison and Possessions"
     },
     {
       "key": "12",
-      "color": "#ADB9B2",
+      "color": "#374151",
+      "color_dark": "#9CA3AF",
       "clusterLabel": "Optimism, Hope, Development and Humor"
     },
     {
       "key": "13",
-      "color": "#4093B0",
+      "color": "#6B21A8",
+      "color_dark": "#A855F7",
       "clusterLabel": "Engagement, Challenge, Involvement and Commitment"
     },
     {
       "key": "14",
-      "color": "#A361B1",
+      "color": "#C2410C",
+      "color_dark": "#F97316",
       "clusterLabel": "Consideration, Openness, Sensation and Authentic leadership"
     },
     {
       "key": "15",
-      "color": "#B0934C",
+      "color": "#A16207",
+      "color_dark": "#EAB308",
       "clusterLabel": "Resilience, Acceptance, Personal competence and Agency thinking"
     },
     {
       "key": "16",
-      "color": "#4F5446",
+      "color": "#0891B2",
+      "color_dark": "#06B6D4",
       "clusterLabel": "Identity, Sex life, Sexual function and Sex"
     },
     {
       "key": "17",
-      "color": "#79817D",
+      "color": "#4F46E5",
+      "color_dark": "#818CF8",
       "clusterLabel": "Stress, Problems, Rumination and Self-criticism"
     },
     {
       "key": "18",
-      "color": "#57A2B1",
+      "color": "#0E7490",
+      "color_dark": "#22D3EE",
       "clusterLabel": "Physical environment, Economy, Community wellbeing and Environment"
     },
     {
       "key": "19",
-      "color": "#844479",
+      "color": "#78350F",
+      "color_dark": "#B45309",
       "clusterLabel": "Gratitude, Appreciation, Savouring and Simple appreciation"
     },
     {
       "key": "20",
-      "color": "#6464B0",
+      "color": "#1F2937",
+      "color_dark": "#6B7280",
       "clusterLabel": "Active-antisocial coping, Interactive barriers to equanimity, Aggressive action and Antisocial action"
     },
     {
       "key": "21",
-      "color": "#7C7B3B",
+      "color": "#1D4ED8",
+      "color_dark": "#2563EB",
       "clusterLabel": "Feeling upset, Regret, Life evaluation and Future life satisfaction"
     },
     {
       "key": "22",
-      "color": "#77ABA4",
+      "color": "#047857",
+      "color_dark": "#10B981",
       "clusterLabel": "Comfort, Relaxation, Difficulty and Ease"
     },
     {
       "key": "23",
-      "color": "#3D717B",
+      "color": "#BE123C",
+      "color_dark": "#F43F5E",
       "clusterLabel": "Pain-killer use, Aspirin, Ibuprofen and Analgesic"
     },
     {
       "key": "24",
-      "color": "#3BAF7C",
+      "color": "#7C3AED",
+      "color_dark": "#8B5CF6",
       "clusterLabel": "Alcohol consumption, Alcohol, Alcohol consumption and Drinking alcohol"
     },
     {
       "key": "25",
-      "color": "#7DB160",
+      "color": "#EA580C",
+      "color_dark": "#FB923C",
       "clusterLabel": "Helping the country flourish, Political involvement, Political work and Civic work"
     },
     {
       "key": "26",
-      "color": "#B06A70",
+      "color": "#4D7C0F",
+      "color_dark": "#84CC16",
       "clusterLabel": "Caffine, Coffee, Tea and Soft-drink"
     },
     {
       "key": "27",
-      "color": "#B1918D",
+      "color": "#0284C7",
+      "color_dark": "#0EA5E9",
       "clusterLabel": "Physical affection, Physical touch, Touch and Lack of physical touch"
     },
     {
       "key": "28",
-      "color": "#8E88AF",
+      "color": "#4338CA",
+      "color_dark": "#6366F1",
       "clusterLabel": "Intimate relations, Marriage, Couples"
     }
   ],
