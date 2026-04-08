@@ -3,6 +3,7 @@ import { keyBy, mapValues, sortBy, values } from "lodash";
 import { FC, useEffect, useMemo, useState } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { MdGroupWork } from "react-icons/md";
+import { BiRadioCircleMarked } from "react-icons/bi";
 
 import { Cluster, FiltersState } from "../types";
 import Panel from "./Panel";
@@ -15,6 +16,9 @@ const ClustersPanel: FC<{
 }> = ({ clusters, filters, toggleCluster, setClusters }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
+
+  const [isolateMode, setIsolateMode] = useState(false);
+  const [isolatedCluster, setIsolatedCluster] = useState<string | null>(null);
 
   const nodesPerCluster = useMemo(() => {
     const index: Record<string, number> = {};
@@ -42,6 +46,38 @@ const ClustersPanel: FC<{
     [clusters, nodesPerCluster],
   );
 
+  const handleClusterClick = (clusterKey: string) => {
+    if (isolateMode) {
+      // In isolate mode
+      if (isolatedCluster === clusterKey) {
+        // Clicking the same cluster: show all clusters
+        setIsolatedCluster(null);
+        setClusters(mapValues(keyBy(clusters, "key"), () => true));
+      } else {
+        // Clicking a different cluster: isolate only that cluster
+        setIsolatedCluster(clusterKey);
+        setClusters({ [clusterKey]: true });
+      }
+    } else {
+      // Normal mode: toggle cluster
+      toggleCluster(clusterKey);
+    }
+  };
+
+  const handleIsolateModeToggle = () => {
+    if (isolateMode) {
+      // Turning off isolate mode: show all clusters and re-enable buttons
+      setIsolateMode(false);
+      setIsolatedCluster(null);
+      setClusters(mapValues(keyBy(clusters, "key"), () => true));
+    } else {
+      // Turning on isolate mode: show all clusters initially
+      setIsolateMode(true);
+      setIsolatedCluster(null);
+      setClusters(mapValues(keyBy(clusters, "key"), () => true));
+    }
+  };
+
   return (
     <Panel
       title={
@@ -62,11 +98,28 @@ const ClustersPanel: FC<{
         <i className="text-muted">Click a cluster to show/hide related pages from the network.</i>
       </p>
       <p className="buttons">
-        <button className="btn" onClick={() => setClusters(mapValues(keyBy(clusters, "key"), () => true))}>
+        <button 
+          className="btn" 
+          onClick={() => setClusters(mapValues(keyBy(clusters, "key"), () => true))}
+          disabled={isolateMode}
+          style={isolateMode ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+        >
           <AiOutlineCheckCircle /> Check all
         </button>{" "}
-        <button className="btn" onClick={() => setClusters({})}>
+        <button 
+          className="btn" 
+          onClick={() => setClusters({})}
+          disabled={isolateMode}
+          style={isolateMode ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+        >
           <AiOutlineCloseCircle /> Uncheck all
+        </button>{" "}
+        <button 
+          className={`btn ${isolateMode ? "active" : ""}`}
+          onClick={handleIsolateModeToggle}
+          style={isolateMode ? { backgroundColor: "#5a67d8", color: "white" } : {}}
+        >
+          <BiRadioCircleMarked /> Isolate one
         </button>
       </p>
       <ul>
@@ -88,7 +141,7 @@ const ClustersPanel: FC<{
               <input
                 type="checkbox"
                 checked={filters.clusters[cluster.key] || false}
-                onChange={() => toggleCluster(cluster.key)}
+                onChange={() => handleClusterClick(cluster.key)}
                 id={`cluster-${cluster.key}`}
               />
               <label htmlFor={`cluster-${cluster.key}`}>

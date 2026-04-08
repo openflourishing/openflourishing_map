@@ -3,6 +3,7 @@ import { keyBy, mapValues, sortBy, values } from "lodash";
 import { FC, useEffect, useMemo, useState } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { MdLabel } from "react-icons/md";
+import { BiRadioCircleMarked } from "react-icons/bi";
 
 import { FiltersState } from "../types";
 import Panel from "./Panel";
@@ -20,7 +21,8 @@ const ContextsPanel: FC<{
 }> = ({ contexts, filters, toggleContext, setContexts }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
-
+  const [isolateMode, setIsolateMode] = useState(false);
+  const [isolatedContext, setIsolatedContext] = useState<string | null>(null);
   const submissionsPerContext = useMemo(() => {
     const index: Record<string, number> = {};
     graph.forEachNode((_, nodeData) => {
@@ -69,6 +71,38 @@ const ContextsPanel: FC<{
     [contexts, submissionsPerContext]
   );
 
+  const handleContextClick = (contextKey: string) => {
+    if (isolateMode) {
+      // In isolate mode
+      if (isolatedContext === contextKey) {
+        // Clicking the same context: show all contexts
+        setIsolatedContext(null);
+        setContexts(mapValues(keyBy(contexts, "key"), () => true));
+      } else {
+        // Clicking a different context: isolate only that context
+        setIsolatedContext(contextKey);
+        setContexts({ [contextKey]: true });
+      }
+    } else {
+      // Normal mode: toggle context
+      toggleContext(contextKey);
+    }
+  };
+
+  const handleIsolateModeToggle = () => {
+    if (isolateMode) {
+      // Turning off isolate mode: show all contexts and re-enable buttons
+      setIsolateMode(false);
+      setIsolatedContext(null);
+      setContexts(mapValues(keyBy(contexts, "key"), () => true));
+    } else {
+      // Turning on isolate mode: show all contexts initially
+      setIsolateMode(true);
+      setIsolatedContext(null);
+      setContexts(mapValues(keyBy(contexts, "key"), () => true));
+    }
+  };
+
   return (
     <Panel
       title={
@@ -89,11 +123,28 @@ const ContextsPanel: FC<{
         <i className="text-muted">Click a context to show/hide related pages from the network.</i>
       </p>
       <p className="buttons">
-        <button className="btn" onClick={() => setContexts(mapValues(keyBy(contexts, "key"), () => true))}>
+        <button 
+          className="btn" 
+          onClick={() => setContexts(mapValues(keyBy(contexts, "key"), () => true))}
+          disabled={isolateMode}
+          style={isolateMode ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+        >
           <AiOutlineCheckCircle /> Check all
         </button>{" "}
-        <button className="btn" onClick={() => setContexts({})}>
+        <button 
+          className="btn" 
+          onClick={() => setContexts({})}
+          disabled={isolateMode}
+          style={isolateMode ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+        >
           <AiOutlineCloseCircle /> Uncheck all
+        </button>{" "}
+        <button 
+          className={`btn ${isolateMode ? "active" : ""}`}
+          onClick={handleIsolateModeToggle}
+          style={isolateMode ? { backgroundColor: "#5a67d8", color: "white" } : {}}
+        >
+          <BiRadioCircleMarked /> Isolate one
         </button>
       </p>
       <ul>
@@ -115,7 +166,7 @@ const ContextsPanel: FC<{
               <input
                 type="checkbox"
                 checked={filters.contexts[context.key] || false}
-                onChange={() => toggleContext(context.key)}
+                onChange={() => handleContextClick(context.key)}
                 id={`context-${context.key}`}
               />
               <label htmlFor={`context-${context.key}`}>
