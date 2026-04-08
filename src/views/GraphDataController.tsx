@@ -38,7 +38,10 @@ const GraphDataController: FC<PropsWithChildren<{ filters: FiltersState }>> = ({
       
       graph.setNodeAttribute(node, "hidden", !isVisible);
     });
-  }, [graph, filters]);
+    
+    // Force sigma to refresh so edge reducers re-evaluate with updated node hidden states
+    sigma.refresh();
+  }, [graph, filters, sigma]);
 
   return <>{children}</>;
 };

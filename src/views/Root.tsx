@@ -262,7 +262,7 @@ const Root: FC = () => {
   return (
     <div id="app-root" className={[showContents ? "show-contents" : "", darkMode ? "dark-mode" : ""].filter(Boolean).join(" ")}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
-        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} edgeWeightThreshold={edgeWeightThreshold} />
+        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} edgeWeightThreshold={edgeWeightThreshold} darkMode={darkMode} filters={filtersState} />
         <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
         <GraphDataController filters={filtersState} />
         <GraphRotationController 
