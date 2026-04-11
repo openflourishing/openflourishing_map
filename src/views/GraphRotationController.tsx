@@ -344,11 +344,17 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
         
         const depthScale = is3DModeRef.current ? calculateDepthScale(rotated.z, depthMinZ, depthMaxZ, 0.35, 1.75) : 1.0;
         
+        // Map z-position to zIndex: higher z (closer) = higher zIndex (drawn on top)
+        // Normalize z to 0-1000 range for zIndex
+        const zRange = depthMaxZ - depthMinZ;
+        const zIndex = zRange > 0 ? Math.round(((rotated.z - depthMinZ) / zRange) * 1000) : 0;
+        
         return {
           ...attr,
           x: rotated.x,
           y: rotated.y,
           size: original.size * depthScale,
+          zIndex: zIndex,
         };
       });
 

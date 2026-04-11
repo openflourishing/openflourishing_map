@@ -37,11 +37,13 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
           return { ...data, color: hiddenNodeColor, label: "", image: null, highlighted: false, hidden: false };
         }
         if (debouncedHoveredNode) {
-          return node === debouncedHoveredNode ||
+          const isConnected = node === debouncedHoveredNode ||
             graph.hasEdge(node, debouncedHoveredNode) ||
-            graph.hasEdge(debouncedHoveredNode, node)
-            ? { ...data, zIndex: 1 }
-            : { ...data, zIndex: 0, label: "", color: NODE_FADE_COLOR, image: null, highlighted: false };
+            graph.hasEdge(debouncedHoveredNode, node);
+          // Preserve depth-based zIndex, but boost hovered nodes to ensure they're on top
+          return isConnected
+            ? { ...data, zIndex: (data.zIndex || 0) + 10000 }
+            : { ...data, label: "", color: NODE_FADE_COLOR, image: null, highlighted: false };
         }
         return data;
       },
@@ -79,11 +81,13 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
             if (data.hidden) {
               return { ...data, color: hiddenNodeColor, label: "", image: null, highlighted: false, hidden: false };
             }
-            return node === debouncedHoveredNode ||
+            const isConnected = node === debouncedHoveredNode ||
               graph.hasEdge(node, debouncedHoveredNode) ||
-              graph.hasEdge(debouncedHoveredNode, node)
-                ? { ...data, zIndex: 1 }
-                : { ...data, zIndex: 0, label: "", color: NODE_FADE_COLOR, image: null, highlighted: false };
+              graph.hasEdge(debouncedHoveredNode, node);
+            // Preserve depth-based zIndex, but boost hovered nodes to ensure they're on top
+            return isConnected
+                ? { ...data, zIndex: (data.zIndex || 0) + 10000 }
+                : { ...data, label: "", color: NODE_FADE_COLOR, image: null, highlighted: false };
           }
         : (_node, data) => {
             // Show hidden nodes in gray instead of hiding them
