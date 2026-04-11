@@ -76,6 +76,7 @@ const Root: FC = () => {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [showEdges, setShowEdges] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [isRotationDragging, setIsRotationDragging] = useState(false);
   const [maxEdgeWeight, setMaxEdgeWeight] = useState(10);
   const [edgeSliderPos, setEdgeSliderPos] = useState(0);
   const [rotationAngles, setRotationAngles] = useState<RotationAngles>({ rotX: 0, rotY: 0, rotZ: 0 });
@@ -262,12 +263,13 @@ const Root: FC = () => {
   return (
     <div id="app-root" className={[showContents ? "show-contents" : "", darkMode ? "dark-mode" : ""].filter(Boolean).join(" ")}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
-        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} edgeWeightThreshold={edgeWeightThreshold} darkMode={darkMode} filters={filtersState} />
-        <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
+        <GraphSettingsController hoveredNode={hoveredNode} showEdges={showEdges} edgeWeightThreshold={edgeWeightThreshold} darkMode={darkMode} isRotationDragging={isRotationDragging} filters={filtersState} />
+        <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} isRotationDragging={isRotationDragging} />
         <GraphDataController filters={filtersState} />
         <GraphRotationController 
           rotationAngles={rotationAngles} 
           onRotationChange={setRotationAngles}
+          onRotationDragChange={setIsRotationDragging}
           originalPositions={originalPositions.current}
           positions2D={positions2D.current}
           positions3D={positions3D.current}

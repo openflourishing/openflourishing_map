@@ -5,6 +5,7 @@ import { RotationAngles, rotate3D, calculateDepthScale } from "../rotation-utils
 interface GraphRotationControllerProps {
   rotationAngles: RotationAngles;
   onRotationChange: (angles: RotationAngles) => void;
+  onRotationDragChange: (isDragging: boolean) => void;
   originalPositions: Map<string, { x: number; y: number; z: number; size: number }>;
   positions2D: Map<string, { x: number; y: number; z: number }>;
   positions3D: Map<string, { x: number; y: number; z: number }>;
@@ -34,6 +35,7 @@ const ORBIT_SENSITIVITY = 0.4; // degrees per pixel of mouse movement
 const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps>> = ({ 
   rotationAngles,
   onRotationChange,
+  onRotationDragChange,
   originalPositions,
   positions2D,
   positions3D,
@@ -74,6 +76,7 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
       isDragging = true;
       lastX = e.clientX;
       lastY = e.clientY;
+      onRotationDragChange(true);
 
       e.preventDefault();
     };
@@ -102,6 +105,7 @@ const GraphRotationController: FC<PropsWithChildren<GraphRotationControllerProps
     const onMouseUp = (e: MouseEvent) => {
       if (!isDragging) return;
       isDragging = false;
+      onRotationDragChange(false);
       e.stopPropagation();
       e.preventDefault();
     };

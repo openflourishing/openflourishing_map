@@ -11,7 +11,7 @@ const EDGE_FADE_COLOR = "#eee";
 const NODE_HIDDEN_LIGHT = "#d0d0d0";
 const NODE_HIDDEN_DARK = "#505050";
 
-const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null; showEdges: boolean; edgeWeightThreshold: number; darkMode: boolean; filters: FiltersState }>> = ({ children, hoveredNode, showEdges, edgeWeightThreshold, darkMode, filters }) => {
+const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null; showEdges: boolean; edgeWeightThreshold: number; darkMode: boolean; isRotationDragging: boolean; filters: FiltersState }>> = ({ children, hoveredNode, showEdges, edgeWeightThreshold, darkMode, isRotationDragging, filters }) => {
   const sigma = useSigma();
   const setSettings = useSetSettings();
   const graph = sigma.getGraph();
@@ -30,7 +30,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
 
     setSettings({
       defaultDrawNodeLabel: drawLabel,
-      defaultDrawNodeHover: drawHover,
+      defaultDrawNodeHover: isRotationDragging ? undefined : drawHover,
       nodeReducer: (node: string, data: Attributes) => {
         // Show hidden nodes in gray instead of hiding them
         if (data.hidden) {
@@ -61,7 +61,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
         return data;
       },
     });
-  }, [sigma, graph, debouncedHoveredNode, showEdges, edgeWeightThreshold, darkMode, filters]);
+  }, [sigma, graph, debouncedHoveredNode, showEdges, edgeWeightThreshold, darkMode, isRotationDragging, filters]);
 
   /**
    * Update node and edge reducers when a node is hovered, to highlight its
@@ -118,7 +118,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
             return data;
           },
     );
-  }, [sigma, debouncedHoveredNode, showEdges, edgeWeightThreshold, darkMode, graph, filters]);
+  }, [sigma, debouncedHoveredNode, showEdges, edgeWeightThreshold, darkMode, isRotationDragging, graph, filters]);
 
   return <>{children}</>;
 };
