@@ -176,7 +176,7 @@ const Root: FC = () => {
           size: logSize,
           color: LightenDarkenColor(sourceCluster.color, 70),
           color_backup: LightenDarkenColor(sourceCluster.color, 70),
-          color_dark_backup: LightenDarkenColor(sourceCluster.color_dark, 70),
+          color_dark_backup: LightenDarkenColor(sourceCluster.color_dark, -70),
           weight: weight, // Add the weight as an edge attribute
         })
     });

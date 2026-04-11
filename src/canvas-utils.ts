@@ -41,13 +41,16 @@ export function drawHover(context: CanvasRenderingContext2D, data: PlainObject, 
   const subLabel = data.tag !== "unknown" ? data.tag : "";
   const clusterLabel = data.clusterLabel;
 
+  // Detect dark mode
+  const isDarkMode = document.getElementById("app-root")?.classList.contains("dark-mode");
+
   // Then we draw the label background
   context.beginPath();
-  context.fillStyle = "#fff";
+  context.fillStyle = isDarkMode ? "#000" : "#fff";
   context.shadowOffsetX = 0;
   context.shadowOffsetY = 2;
   context.shadowBlur = 8;
-  context.shadowColor = "#000";
+  context.shadowColor = isDarkMode ? "#fff" : "#000";
 
   context.font = `${weight} ${size}px ${font}`;
   const labelWidth = context.measureText(label).width;
@@ -74,12 +77,13 @@ export function drawHover(context: CanvasRenderingContext2D, data: PlainObject, 
   context.shadowBlur = 0;
 
   // And finally we draw the labels
-  context.fillStyle = TEXT_COLOR;
+  const textColor = isDarkMode ? "#fff" : TEXT_COLOR;
+  context.fillStyle = textColor;
   context.font = `${weight} ${size}px ${font}`;
   context.fillText(label, data.x + data.size + 3, data.y + size / 3);
 
   if (subLabel) {
-    context.fillStyle = TEXT_COLOR;
+    context.fillStyle = textColor;
     context.font = `${weight} ${subLabelSize}px ${font}`;
     context.fillText(subLabel, data.x + data.size + 3, data.y - (2 * size) / 3 - 2);
   }
@@ -103,12 +107,15 @@ export function drawLabel(
     font = settings.labelFont,
     weight = settings.labelWeight;
 
+  // Detect dark mode
+  const isDarkMode = document.getElementById("app-root")?.classList.contains("dark-mode");
+
   context.font = `${weight} ${size}px ${font}`;
   const width = context.measureText(data.label).width + 8;
 
-  context.fillStyle = "#ffffffcc";
+  context.fillStyle = isDarkMode ? "#000000cc" : "#ffffffcc";
   context.fillRect(data.x + data.size, data.y + size / 3 - 15, width, 20);
 
-  context.fillStyle = "#000";
+  context.fillStyle = isDarkMode ? "#fff" : "#000";
   context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }
