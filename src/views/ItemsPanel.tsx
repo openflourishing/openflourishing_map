@@ -146,13 +146,7 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
         <div>
           <h4>{graph.getNodeAttribute(selectedNode, "label")}</h4>
           
-          <div style={{ 
-            padding: "10px", 
-            backgroundColor: "#f8f9fa", 
-            borderRadius: "4px", 
-            marginBottom: "1rem",
-            fontSize: "0.9em"
-          }}>
+          <div className="filters-box">
             <div style={{ marginBottom: "10px", fontWeight: "bold" }}>Filters:</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
               <div>
@@ -230,15 +224,7 @@ const ItemsPanel: FC<ItemsPanelProps> = ({ selectedNode }) => {
             </div>
             <button
               onClick={resetFilters}
-              style={{
-                marginTop: "8px",
-                padding: "4px 8px",
-                fontSize: "0.8em",
-                border: "1px solid #ccc",
-                borderRadius: "3px",
-                background: "white",
-                cursor: "pointer"
-              }}
+              className="filters-reset-btn"
             >
               Reset Filters
             </button>

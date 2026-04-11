@@ -174,6 +174,24 @@ button.btn > * {
   justify-content: space-between;
 }
 
+.filters-box {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9em;
+}
+
+.filters-reset-btn {
+  margin-top: 8px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+}
+
 ul {
   list-style: none;
   padding: 0;
@@ -601,6 +619,33 @@ ul > li {
 }
 #app-root.dark-mode .rotary-knob-center {
   background: #777;
+}
+#app-root.dark-mode button.btn {
+  background: #2a2a2a;
+  color: #ddd;
+  border-color: #555;
+}
+#app-root.dark-mode button.btn:hover {
+  background: #333;
+}
+#app-root.dark-mode .filters-box {
+  background-color: #2a2a2a;
+}
+#app-root.dark-mode .filters-box select {
+  background: #1a1a1a;
+  color: #ddd;
+  border-color: #555;
+}
+#app-root.dark-mode .filters-box label {
+  color: #ddd;
+}
+#app-root.dark-mode .filters-reset-btn {
+  background: #2a2a2a;
+  color: #ddd;
+  border-color: #555;
+}
+#app-root.dark-mode .filters-reset-btn:hover {
+  background: #333;
 }
 #app-root.dark-mode .reset-rotation-btn {
   background: #333;
